@@ -21,7 +21,7 @@ export function Input({ label, className, id, ...props }: InputProps) {
       <input
         id={inputId}
         className={clsx(
-          'w-full rounded-lg border border-gray-200 bg-white px-4 py-3 text-base placeholder:text-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder:text-gray-500 dark:disabled:bg-gray-700 sm:px-3 sm:py-2.5 sm:text-sm',
+          'w-full border-2 border-gray-900 bg-white px-4 py-3 text-base placeholder:text-gray-400 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-500 dark:border-gray-500 dark:bg-gray-800 dark:text-white dark:placeholder:text-gray-500 dark:focus:border-primary-500 dark:disabled:bg-gray-700 sm:px-3 sm:py-2.5 sm:text-sm',
           className
         )}
         {...props}

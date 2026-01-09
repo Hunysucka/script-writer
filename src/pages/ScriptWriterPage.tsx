@@ -53,7 +53,7 @@ export function ScriptWriterPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold text-gray-900 dark:text-white sm:text-xl">Script Writer</h1>
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white sm:text-2xl">Script Writer</h1>
         <p className="mt-2 text-base text-gray-600 dark:text-gray-400 sm:mt-1 sm:text-sm">
           Select research reports and generate a script for your video.
         </p>
@@ -61,7 +61,7 @@ export function ScriptWriterPage() {
 
       {/* Report Selection */}
       <Card>
-        <h2 className="mb-4 text-base font-medium text-gray-900 dark:text-white sm:mb-3 sm:text-sm">Select Reports</h2>
+        <h2 className="mb-4 text-lg font-bold uppercase tracking-wide text-gray-900 dark:text-white sm:mb-3 sm:text-base">Select Reports</h2>
         {state.reports.length === 0 ? (
           <p className="text-base text-gray-500 dark:text-gray-400 sm:text-sm">
             No reports yet. Create one in the Research tab first.
@@ -93,7 +93,7 @@ export function ScriptWriterPage() {
       <Card>
         <div className="space-y-5 sm:space-y-4">
           <div>
-            <label className="mb-2 block text-base font-medium text-gray-700 dark:text-gray-300 sm:mb-1.5 sm:text-sm">
+            <label className="mb-2 block text-base font-semibold uppercase tracking-wide text-gray-700 dark:text-gray-300 sm:mb-1.5 sm:text-sm">
               Script Prompt
             </label>
             <textarea
@@ -101,12 +101,12 @@ export function ScriptWriterPage() {
               onChange={(e) => setPrompt(e.target.value)}
               placeholder="Describe the style and tone you want for the script..."
               rows={4}
-              className="w-full rounded-lg border border-gray-200 bg-white px-4 py-3 text-base focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder:text-gray-500 sm:px-3 sm:py-2 sm:text-sm"
+              className="w-full border-2 border-gray-900 bg-white px-4 py-3 text-base focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 dark:border-gray-500 dark:bg-gray-800 dark:text-white dark:placeholder:text-gray-500 sm:px-3 sm:py-2 sm:text-sm"
             />
           </div>
 
           <div>
-            <label className="mb-2 block text-base font-medium text-gray-700 dark:text-gray-300 sm:mb-1.5 sm:text-sm">
+            <label className="mb-2 block text-base font-semibold uppercase tracking-wide text-gray-700 dark:text-gray-300 sm:mb-1.5 sm:text-sm">
               Platform
             </label>
             <div className="flex flex-wrap gap-2">
@@ -115,10 +115,10 @@ export function ScriptWriterPage() {
                   key={p}
                   type="button"
                   onClick={() => setPlatform(p)}
-                  className={`min-h-[44px] rounded-lg px-5 py-3 text-base font-medium transition-colors sm:min-h-0 sm:px-4 sm:py-2 sm:text-sm ${
+                  className={`min-h-[44px] px-5 py-3 text-base font-semibold uppercase tracking-wide transition-colors sm:min-h-0 sm:px-4 sm:py-2 sm:text-sm ${
                     platform === p
-                      ? 'bg-blue-600 text-white dark:bg-blue-500'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600'
+                      ? 'bg-primary-500 text-white'
+                      : 'border-2 border-gray-900 bg-white text-gray-900 hover:bg-gray-100 dark:border-gray-500 dark:bg-transparent dark:text-gray-200 dark:hover:bg-gray-700'
                   }`}
                 >
                   {p === 'youtube' ? 'YouTube' : p === 'instagram' ? 'Instagram' : 'Both'}
@@ -147,7 +147,7 @@ export function ScriptWriterPage() {
               onChange={(e) =>
                 setGeneratedScript({ ...generatedScript, title: e.target.value })
               }
-              className="w-full border-b border-gray-200 bg-transparent pb-3 text-xl font-medium text-gray-900 focus:border-blue-500 focus:outline-none dark:border-gray-600 dark:text-white sm:pb-2 sm:text-lg"
+              className="w-full border-b-2 border-gray-900 bg-transparent pb-3 text-xl font-bold uppercase text-gray-900 focus:border-primary-500 focus:outline-none dark:border-gray-600 dark:text-white sm:pb-2 sm:text-lg"
             />
             <textarea
               value={generatedScript.content}
@@ -155,7 +155,7 @@ export function ScriptWriterPage() {
                 setGeneratedScript({ ...generatedScript, content: e.target.value })
               }
               rows={12}
-              className="w-full rounded-lg border border-gray-200 bg-white p-4 text-base focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:p-3 sm:text-sm"
+              className="w-full border-2 border-gray-900 bg-white p-4 text-base focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:p-3 sm:text-sm"
             />
             <div className="flex flex-col gap-3 sm:flex-row sm:gap-2">
               <Button onClick={handleSaveScript}>Save Script</Button>

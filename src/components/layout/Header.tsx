@@ -15,9 +15,9 @@ export function Header() {
   const { theme, toggleTheme } = useTheme()
 
   return (
-    <header className="sticky top-0 z-50 border-b border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-900">
+    <header className="sticky top-0 z-50 border-b-2 border-gray-900 bg-white dark:border-gray-600 dark:bg-gray-900">
       <div className="mx-auto flex h-16 max-w-4xl items-center justify-between px-4 sm:h-14">
-        <Link to="/" className="text-xl font-semibold text-gray-900 dark:text-white sm:text-lg">
+        <Link to="/" className="font-display text-2xl font-bold uppercase tracking-wide text-gray-900 dark:text-white sm:text-xl">
           ScriptWriter
         </Link>
 
@@ -28,10 +28,10 @@ export function Header() {
               key={item.path}
               to={item.path}
               className={clsx(
-                'rounded-lg px-3 py-2 text-sm font-medium transition-colors',
+                'px-3 py-2 text-sm font-semibold uppercase tracking-wide transition-colors',
                 location.pathname === item.path
-                  ? 'bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-white'
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white'
+                  ? 'bg-primary-500 text-white'
+                  : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'
               )}
             >
               {item.label}
@@ -40,7 +40,7 @@ export function Header() {
           <button
             type="button"
             onClick={toggleTheme}
-            className="ml-2 rounded-lg p-2 text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-gray-800"
+            className="ml-2 p-2 text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
             aria-label="Toggle theme"
           >
             {theme === 'dark' ? (
@@ -60,7 +60,7 @@ export function Header() {
           <button
             type="button"
             onClick={toggleTheme}
-            className="min-h-[44px] min-w-[44px] rounded-lg p-2 text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-gray-800"
+            className="min-h-[44px] min-w-[44px] p-2 text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
             aria-label="Toggle theme"
           >
             {theme === 'dark' ? (
@@ -76,7 +76,7 @@ export function Header() {
           <button
             type="button"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="min-h-[44px] min-w-[44px] rounded-lg p-2 text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-gray-800"
+            className="min-h-[44px] min-w-[44px] p-2 text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
             aria-label="Toggle menu"
           >
             <svg
@@ -107,17 +107,17 @@ export function Header() {
 
       {/* Mobile nav */}
       {mobileMenuOpen && (
-        <nav className="border-t border-gray-200 px-4 py-3 dark:border-gray-700 sm:hidden">
+        <nav className="border-t-2 border-gray-900 px-4 py-3 dark:border-gray-600 sm:hidden">
           {navItems.map((item) => (
             <Link
               key={item.path}
               to={item.path}
               onClick={() => setMobileMenuOpen(false)}
               className={clsx(
-                'block min-h-[48px] rounded-lg px-4 py-3 text-base font-medium transition-colors',
+                'block min-h-[48px] px-4 py-3 text-base font-semibold uppercase tracking-wide transition-colors',
                 location.pathname === item.path
-                  ? 'bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-white'
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white'
+                  ? 'bg-primary-500 text-white'
+                  : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'
               )}
             >
               {item.label}
