@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react'
+import { toast } from 'sonner'
 import { useAppContext } from '@/hooks'
 import { Card } from '@/components/ui/Card'
 import { Input } from '@/components/ui/Input'
@@ -40,10 +41,18 @@ export function CatalogsPage() {
   const handleDelete = (id: string, type: 'report' | 'script') => {
     if (type === 'report') {
       dispatch({ type: 'DELETE_REPORT', payload: id })
+      toast.success('Report deleted')
     } else {
       dispatch({ type: 'DELETE_SCRIPT', payload: id })
+      toast.success('Script deleted')
     }
     setSelectedItem(null)
+  }
+
+  const handleCopyContent = () => {
+    if (!selectedItem) return
+    navigator.clipboard.writeText(selectedItem.content)
+    toast.success('Copied to clipboard')
   }
 
   const getReportSubject = (report: ResearchReport): string => {
@@ -243,7 +252,7 @@ export function CatalogsPage() {
             <div className="mt-6 flex justify-end gap-2">
               <button
                 type="button"
-                onClick={() => navigator.clipboard.writeText(selectedItem.content)}
+                onClick={handleCopyContent}
                 className="rounded-lg px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100"
               >
                 Copy Content

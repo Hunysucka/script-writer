@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { toast } from 'sonner'
 import { useAppContext } from '@/hooks'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
@@ -48,6 +49,9 @@ export function ResearchPage() {
             dispatch({ type: 'ADD_REPORT', payload: report })
             setViewingReport(report)
             setEditedContent(report.content)
+            toast.success('Research complete!')
+          } else if (status.status === 'failed') {
+            toast.error('Research failed. Please try again.')
           }
           dispatch({ type: 'SET_ACTIVE_JOB', payload: null })
           // Clear form
@@ -58,6 +62,7 @@ export function ResearchPage() {
       }, 500)
     } catch {
       dispatch({ type: 'SET_ERROR', payload: 'Failed to start research' })
+      toast.error('Failed to start research')
     }
   }
 
@@ -70,6 +75,12 @@ export function ResearchPage() {
     }
     dispatch({ type: 'UPDATE_REPORT', payload: updated })
     setViewingReport(updated)
+    toast.success('Report saved')
+  }
+
+  const handleCopyContent = () => {
+    navigator.clipboard.writeText(editedContent)
+    toast.success('Copied to clipboard')
   }
 
   const handleViewReport = (report: ResearchReport) => {
@@ -109,7 +120,7 @@ export function ResearchPage() {
             Back to Research
           </button>
           <div className="flex gap-2">
-            <Button variant="secondary" onClick={() => navigator.clipboard.writeText(editedContent)}>
+            <Button variant="secondary" onClick={handleCopyContent}>
               Copy
             </Button>
             <Button onClick={handleSaveReport}>Save Changes</Button>

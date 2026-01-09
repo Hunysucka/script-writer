@@ -1,9 +1,16 @@
 import { useState } from 'react'
+import { toast } from 'sonner'
 import { useAppContext } from '@/hooks'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
 import { scriptService } from '@/services/scriptService'
 import type { ScriptPlatform, ResearchReport, Script } from '@/types'
+
+function getReportSubtitle(report: ResearchReport): string {
+  if (report.researchType === 'book') return report.bookTitle || ''
+  if (report.researchType === 'author') return report.authorName || ''
+  return report.topic || ''
+}
 
 export function ScriptWriterPage() {
   const { state, dispatch } = useAppContext()
@@ -33,8 +40,10 @@ export function ScriptWriterPage() {
       })
       setGeneratedScript(script)
       dispatch({ type: 'ADD_SCRIPT', payload: script })
+      toast.success('Script generated!')
     } catch {
       dispatch({ type: 'SET_ERROR', payload: 'Failed to generate script' })
+      toast.error('Failed to generate script')
     } finally {
       setIsGenerating(false)
     }
@@ -48,6 +57,13 @@ export function ScriptWriterPage() {
     setGeneratedScript(null)
     setSelectedReportIds([])
     setPrompt('')
+    toast.success('Script saved')
+  }
+
+  const handleCopyScript = () => {
+    if (!generatedScript) return
+    navigator.clipboard.writeText(generatedScript.content)
+    toast.success('Copied to clipboard')
   }
 
   return (
@@ -81,7 +97,7 @@ export function ScriptWriterPage() {
                 />
                 <div className="flex-1">
                   <p className="text-sm font-medium text-gray-900">{report.title}</p>
-                  <p className="text-xs text-gray-500">{report.topic}</p>
+                  <p className="text-xs text-gray-500">{getReportSubtitle(report)}</p>
                 </div>
               </label>
             ))}
@@ -159,10 +175,7 @@ export function ScriptWriterPage() {
             />
             <div className="flex gap-2">
               <Button onClick={handleSaveScript}>Save Script</Button>
-              <Button
-                variant="secondary"
-                onClick={() => navigator.clipboard.writeText(generatedScript.content)}
-              >
+              <Button variant="secondary" onClick={handleCopyScript}>
                 Copy to Clipboard
               </Button>
             </div>

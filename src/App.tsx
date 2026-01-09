@@ -1,5 +1,6 @@
 import { lazy, Suspense } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { Toaster } from 'sonner'
 import { Layout } from '@/components/layout'
 
 const ResearchPage = lazy(() =>
@@ -23,6 +24,7 @@ function PageLoader() {
 export default function App() {
   return (
     <BrowserRouter>
+      <Toaster position="bottom-right" richColors />
       <Suspense fallback={<PageLoader />}>
         <Routes>
           <Route element={<Layout />}>
