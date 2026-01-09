@@ -96,19 +96,19 @@ export function ResearchPage() {
   // If viewing a report, show the editor
   if (viewingReport) {
     return (
-      <div className="space-y-4">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div className="space-y-6">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <button
             type="button"
             onClick={() => setViewingReport(null)}
-            className="flex min-h-[44px] items-center gap-2 text-base font-semibold uppercase tracking-wide text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white sm:min-h-0 sm:text-sm"
+            className="flex min-h-[44px] items-center gap-2 text-base text-accent-600 transition-colors hover:text-accent-800 dark:text-accent-400 dark:hover:text-accent-200 sm:min-h-0 sm:text-sm"
           >
             <svg className="h-5 w-5 sm:h-4 sm:w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
             Back to Research
           </button>
-          <div className="flex gap-2">
+          <div className="flex gap-3 sm:gap-2">
             <Button variant="secondary" onClick={() => navigator.clipboard.writeText(editedContent)}>
               Copy
             </Button>
@@ -117,8 +117,8 @@ export function ResearchPage() {
         </div>
 
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white sm:text-2xl">{viewingReport.title}</h1>
-          <p className="mt-1 text-base text-gray-500 dark:text-gray-400 sm:text-sm">
+          <h1 className="font-serif text-3xl font-semibold text-ink dark:text-ink-light sm:text-2xl">{viewingReport.title}</h1>
+          <p className="mt-2 text-base italic text-accent-500 dark:text-accent-400 sm:text-sm">
             {viewingReport.researchType === 'book' && viewingReport.bookTitle}
             {viewingReport.researchType === 'author' && viewingReport.authorName}
             {viewingReport.researchType === 'topic' && viewingReport.topic}
@@ -134,10 +134,13 @@ export function ResearchPage() {
 
         {viewingReport.sources.length > 0 && (
           <Card>
-            <h3 className="mb-2 text-base font-medium text-gray-700 dark:text-gray-300 sm:text-sm">Sources</h3>
-            <ul className="space-y-2 text-base text-gray-600 dark:text-gray-400 sm:space-y-1 sm:text-sm">
+            <h3 className="mb-3 font-serif text-lg font-medium text-accent-700 dark:text-accent-300 sm:mb-2 sm:text-base">Sources</h3>
+            <ul className="space-y-2 text-base leading-relaxed text-accent-600 dark:text-accent-400 sm:space-y-1 sm:text-sm">
               {viewingReport.sources.map((source, i) => (
-                <li key={i}>• {source}</li>
+                <li key={i} className="flex gap-2">
+                  <span className="text-accent-400">•</span>
+                  <span>{source}</span>
+                </li>
               ))}
             </ul>
           </Card>
@@ -147,32 +150,32 @@ export function ResearchPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white sm:text-2xl">Research Agent</h1>
-        <p className="mt-2 text-base text-gray-600 dark:text-gray-400 sm:mt-1 sm:text-sm">
+        <h1 className="font-serif text-3xl font-semibold text-ink dark:text-ink-light sm:text-2xl">Research Agent</h1>
+        <p className="mt-3 text-lg leading-relaxed text-accent-600 dark:text-accent-400 sm:mt-2 sm:text-base">
           Research a book, author, or topic. The agent will create a detailed markdown report.
         </p>
       </div>
 
       <Card>
-        <div className="space-y-5 sm:space-y-4">
+        <div className="space-y-6 sm:space-y-5">
           {/* Research Type Selector */}
           <div>
-            <label className="mb-2 block text-base font-semibold uppercase tracking-wide text-gray-700 dark:text-gray-300 sm:mb-1.5 sm:text-sm">
-              Research Type
+            <label className="mb-3 block font-serif text-base font-medium text-accent-700 dark:text-accent-300 sm:mb-2 sm:text-sm">
+              What would you like to research?
             </label>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-3 sm:gap-2">
               {(['book', 'author', 'topic'] as const).map((type) => (
                 <button
                   key={type}
                   type="button"
                   onClick={() => setResearchType(type)}
                   disabled={isResearching}
-                  className={`min-h-[44px] px-5 py-3 text-base font-semibold uppercase tracking-wide transition-colors sm:min-h-0 sm:px-4 sm:py-2 sm:text-sm ${
+                  className={`min-h-[44px] rounded-md px-5 py-3 text-base font-medium transition-all duration-200 sm:min-h-0 sm:px-4 sm:py-2 sm:text-sm ${
                     researchType === type
-                      ? 'bg-primary-500 text-white'
-                      : 'border-2 border-gray-900 bg-white text-gray-900 hover:bg-gray-100 dark:border-gray-500 dark:bg-transparent dark:text-gray-200 dark:hover:bg-gray-700'
+                      ? 'bg-accent-500 text-white shadow-sm'
+                      : 'border border-accent-200 bg-white text-accent-700 hover:bg-accent-50 dark:border-accent-700 dark:bg-transparent dark:text-accent-300 dark:hover:bg-accent-900/30'
                   } disabled:opacity-50`}
                 >
                   {type === 'book' ? 'Book' : type === 'author' ? 'Author' : 'Topic'}
@@ -234,18 +237,18 @@ export function ResearchPage() {
       {/* Progress Indicator */}
       {isResearching && activeJob && (
         <Card>
-          <div className="space-y-3">
+          <div className="space-y-4">
             <div className="flex items-center justify-between text-base sm:text-sm">
-              <span className="font-semibold uppercase tracking-wide text-gray-600 dark:text-gray-400">Researching: {getResearchLabel()}</span>
-              <span className="font-bold text-gray-900 dark:text-white">{activeJob.progress}%</span>
+              <span className="font-serif italic text-accent-600 dark:text-accent-400">Researching: {getResearchLabel()}</span>
+              <span className="font-medium text-accent-700 dark:text-accent-300">{activeJob.progress}%</span>
             </div>
-            <div className="h-3 overflow-hidden bg-gray-200 dark:bg-gray-700 sm:h-2">
+            <div className="h-2 overflow-hidden rounded-full bg-accent-100 dark:bg-accent-800">
               <div
-                className="h-full bg-primary-500 transition-all duration-300"
+                className="h-full rounded-full bg-accent-500 transition-all duration-500"
                 style={{ width: `${activeJob.progress}%` }}
               />
             </div>
-            <p className="text-sm text-gray-500 dark:text-gray-400 sm:text-xs">
+            <p className="text-sm italic text-accent-500 dark:text-accent-500 sm:text-xs">
               Gathering information, analyzing sources, writing report...
             </p>
           </div>
@@ -254,25 +257,25 @@ export function ResearchPage() {
 
       {/* Recent Reports */}
       {state.reports.length > 0 && (
-        <div className="space-y-4">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white sm:text-xl">Recent Reports</h2>
+        <div className="space-y-5">
+          <h2 className="font-serif text-2xl font-semibold text-ink dark:text-ink-light sm:text-xl">Recent Reports</h2>
           {state.reports.slice(0, 5).map((report) => (
             <Card
               key={report.id}
               onClick={() => handleViewReport(report)}
-              className="cursor-pointer transition-colors hover:bg-gray-50 active:bg-gray-100 dark:hover:bg-gray-700 dark:active:bg-gray-600"
+              className="cursor-pointer transition-all duration-200 hover:border-accent-300 hover:shadow-md dark:hover:border-accent-600"
             >
-              <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <div className="flex-1">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className="bg-primary-500 px-2.5 py-1 text-sm font-semibold uppercase text-white sm:px-2 sm:py-0.5 sm:text-xs">
+                  <div className="flex flex-wrap items-center gap-3 sm:gap-2">
+                    <span className="rounded-full bg-accent-100 px-3 py-1 text-sm font-medium text-accent-700 dark:bg-accent-800 dark:text-accent-300 sm:px-2 sm:py-0.5 sm:text-xs">
                       {report.researchType}
                     </span>
-                    <h3 className="text-base font-semibold text-gray-900 dark:text-white sm:text-sm">{report.title}</h3>
+                    <h3 className="font-serif text-lg font-medium text-ink dark:text-ink-light sm:text-base">{report.title}</h3>
                   </div>
-                  <p className="mt-2 line-clamp-2 text-base text-gray-600 dark:text-gray-400 sm:mt-1 sm:text-sm">{report.summary}</p>
+                  <p className="mt-2 line-clamp-2 text-base leading-relaxed text-accent-600 dark:text-accent-400 sm:mt-1 sm:text-sm">{report.summary}</p>
                 </div>
-                <span className="shrink-0 text-sm font-medium text-gray-400 dark:text-gray-500 sm:ml-4 sm:text-xs">
+                <span className="shrink-0 text-sm text-accent-400 dark:text-accent-500 sm:ml-4 sm:text-xs">
                   {new Date(report.createdAt).toLocaleDateString()}
                 </span>
               </div>
