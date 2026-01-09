@@ -152,7 +152,7 @@ export function ResearchPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="font-serif text-3xl font-semibold text-ink dark:text-ink-light sm:text-2xl">Research Agent</h1>
+        <h1 className="font-serif text-3xl font-semibold text-ink dark:text-accent-400 sm:text-2xl">Research Agent</h1>
         <p className="mt-3 text-lg leading-relaxed text-accent-600 dark:text-accent-400 sm:mt-2 sm:text-base">
           Research a book, author, or topic. The agent will create a detailed markdown report.
         </p>
