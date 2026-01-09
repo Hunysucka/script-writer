@@ -97,13 +97,13 @@ export function ResearchPage() {
   if (viewingReport) {
     return (
       <div className="space-y-4">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <button
             type="button"
             onClick={() => setViewingReport(null)}
-            className="flex items-center gap-1 text-sm text-gray-600 hover:text-gray-900"
+            className="flex min-h-[44px] items-center gap-2 text-base text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white sm:min-h-0 sm:text-sm"
           >
-            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="h-5 w-5 sm:h-4 sm:w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
             Back to Research
@@ -117,8 +117,8 @@ export function ResearchPage() {
         </div>
 
         <div>
-          <h1 className="text-2xl font-semibold text-gray-900">{viewingReport.title}</h1>
-          <p className="mt-1 text-sm text-gray-500">
+          <h1 className="text-2xl font-semibold text-gray-900 dark:text-white sm:text-xl">{viewingReport.title}</h1>
+          <p className="mt-1 text-base text-gray-500 dark:text-gray-400 sm:text-sm">
             {viewingReport.researchType === 'book' && viewingReport.bookTitle}
             {viewingReport.researchType === 'author' && viewingReport.authorName}
             {viewingReport.researchType === 'topic' && viewingReport.topic}
@@ -134,8 +134,8 @@ export function ResearchPage() {
 
         {viewingReport.sources.length > 0 && (
           <Card>
-            <h3 className="mb-2 text-sm font-medium text-gray-700">Sources</h3>
-            <ul className="space-y-1 text-sm text-gray-600">
+            <h3 className="mb-2 text-base font-medium text-gray-700 dark:text-gray-300 sm:text-sm">Sources</h3>
+            <ul className="space-y-2 text-base text-gray-600 dark:text-gray-400 sm:space-y-1 sm:text-sm">
               {viewingReport.sources.map((source, i) => (
                 <li key={i}>• {source}</li>
               ))}
@@ -149,30 +149,30 @@ export function ResearchPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold text-gray-900">Research Agent</h1>
-        <p className="mt-1 text-gray-600">
+        <h1 className="text-2xl font-semibold text-gray-900 dark:text-white sm:text-xl">Research Agent</h1>
+        <p className="mt-2 text-base text-gray-600 dark:text-gray-400 sm:mt-1 sm:text-sm">
           Research a book, author, or topic. The agent will create a detailed markdown report.
         </p>
       </div>
 
       <Card>
-        <div className="space-y-4">
+        <div className="space-y-5 sm:space-y-4">
           {/* Research Type Selector */}
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-gray-700">
+            <label className="mb-2 block text-base font-medium text-gray-700 dark:text-gray-300 sm:mb-1.5 sm:text-sm">
               Research Type
             </label>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               {(['book', 'author', 'topic'] as const).map((type) => (
                 <button
                   key={type}
                   type="button"
                   onClick={() => setResearchType(type)}
                   disabled={isResearching}
-                  className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
+                  className={`min-h-[44px] rounded-lg px-5 py-3 text-base font-medium transition-colors sm:min-h-0 sm:px-4 sm:py-2 sm:text-sm ${
                     researchType === type
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      ? 'bg-blue-600 text-white dark:bg-blue-500'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600'
                   } disabled:opacity-50`}
                 >
                   {type === 'book' ? 'Book' : type === 'author' ? 'Author' : 'Topic'}
@@ -235,17 +235,17 @@ export function ResearchPage() {
       {isResearching && activeJob && (
         <Card>
           <div className="space-y-3">
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-gray-600">Researching: {getResearchLabel()}</span>
-              <span className="font-medium text-gray-900">{activeJob.progress}%</span>
+            <div className="flex items-center justify-between text-base sm:text-sm">
+              <span className="text-gray-600 dark:text-gray-400">Researching: {getResearchLabel()}</span>
+              <span className="font-medium text-gray-900 dark:text-white">{activeJob.progress}%</span>
             </div>
-            <div className="h-2 overflow-hidden rounded-full bg-gray-100">
+            <div className="h-3 overflow-hidden rounded-full bg-gray-100 dark:bg-gray-700 sm:h-2">
               <div
-                className="h-full bg-blue-600 transition-all duration-300"
+                className="h-full bg-blue-600 transition-all duration-300 dark:bg-blue-500"
                 style={{ width: `${activeJob.progress}%` }}
               />
             </div>
-            <p className="text-xs text-gray-500">
+            <p className="text-sm text-gray-500 dark:text-gray-400 sm:text-xs">
               Gathering information, analyzing sources, writing report...
             </p>
           </div>
@@ -255,24 +255,24 @@ export function ResearchPage() {
       {/* Recent Reports */}
       {state.reports.length > 0 && (
         <div className="space-y-4">
-          <h2 className="text-lg font-medium text-gray-900">Recent Reports</h2>
+          <h2 className="text-xl font-medium text-gray-900 dark:text-white sm:text-lg">Recent Reports</h2>
           {state.reports.slice(0, 5).map((report) => (
             <Card
               key={report.id}
               onClick={() => handleViewReport(report)}
-              className="cursor-pointer hover:border-gray-300"
+              className="cursor-pointer active:bg-gray-50 dark:active:bg-gray-700 sm:hover:border-gray-300 dark:sm:hover:border-gray-600"
             >
-              <div className="flex items-start justify-between">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600">
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                <div className="flex-1">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="rounded-full bg-gray-100 px-2.5 py-1 text-sm font-medium text-gray-600 dark:bg-gray-700 dark:text-gray-300 sm:px-2 sm:py-0.5 sm:text-xs">
                       {report.researchType}
                     </span>
-                    <h3 className="font-medium text-gray-900">{report.title}</h3>
+                    <h3 className="text-base font-medium text-gray-900 dark:text-white sm:text-sm">{report.title}</h3>
                   </div>
-                  <p className="mt-1 line-clamp-2 text-sm text-gray-600">{report.summary}</p>
+                  <p className="mt-2 line-clamp-2 text-base text-gray-600 dark:text-gray-400 sm:mt-1 sm:text-sm">{report.summary}</p>
                 </div>
-                <span className="ml-4 shrink-0 text-xs text-gray-400">
+                <span className="shrink-0 text-sm text-gray-400 dark:text-gray-500 sm:ml-4 sm:text-xs">
                   {new Date(report.createdAt).toLocaleDateString()}
                 </span>
               </div>
