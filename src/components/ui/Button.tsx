@@ -19,9 +19,9 @@ export function Button({
       type="button"
       disabled={disabled || loading}
       className={clsx(
-        'inline-flex items-center justify-center rounded-lg px-4 py-2.5 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
-        variant === 'primary' && 'bg-blue-600 text-white hover:bg-blue-700',
-        variant === 'secondary' && 'bg-gray-100 text-gray-700 hover:bg-gray-200',
+        'inline-flex min-h-[44px] items-center justify-center rounded-md px-5 py-3 text-base font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-accent-500/50 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 sm:min-h-[40px] sm:px-4 sm:py-2.5 sm:text-sm',
+        variant === 'primary' && 'bg-accent-500 text-white hover:bg-accent-600 dark:bg-accent-600 dark:hover:bg-accent-500',
+        variant === 'secondary' && 'border border-accent-300 bg-white text-accent-700 hover:bg-accent-50 dark:border-accent-700 dark:bg-transparent dark:text-accent-200 dark:hover:bg-accent-900/30',
         className
       )}
       {...props}

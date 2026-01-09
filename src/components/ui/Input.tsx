@@ -13,7 +13,7 @@ export function Input({ label, className, id, ...props }: InputProps) {
       {label && (
         <label
           htmlFor={inputId}
-          className="mb-1.5 block text-sm font-medium text-gray-700"
+          className="mb-2 block font-serif text-base font-medium text-accent-700 dark:text-accent-300 sm:mb-1.5 sm:text-sm"
         >
           {label}
         </label>
@@ -21,7 +21,7 @@ export function Input({ label, className, id, ...props }: InputProps) {
       <input
         id={inputId}
         className={clsx(
-          'w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm placeholder:text-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-500',
+          'w-full rounded-md border border-accent-200 bg-white px-4 py-3 text-base transition-colors placeholder:text-accent-400 focus:border-accent-500 focus:outline-none focus:ring-2 focus:ring-accent-500/20 disabled:cursor-not-allowed disabled:bg-accent-50 disabled:text-accent-400 dark:border-accent-700 dark:bg-paper-dark dark:text-ink-light dark:placeholder:text-accent-600 dark:focus:border-accent-500 dark:disabled:bg-accent-900 sm:px-3 sm:py-2.5 sm:text-sm',
           className
         )}
         {...props}
