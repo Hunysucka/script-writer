@@ -16,6 +16,14 @@ export function appReducer(state: AppState, action: AppAction): AppState {
     case 'ADD_REPORT':
       return { ...state, reports: [action.payload, ...state.reports] }
 
+    case 'UPDATE_REPORT':
+      return {
+        ...state,
+        reports: state.reports.map((r) =>
+          r.id === action.payload.id ? action.payload : r
+        ),
+      }
+
     case 'DELETE_REPORT':
       return {
         ...state,

@@ -13,7 +13,9 @@ export const reportService = {
     return reports.filter(
       (r) =>
         r.title.toLowerCase().includes(query) ||
-        r.topic.toLowerCase().includes(query)
+        (r.bookTitle?.toLowerCase().includes(query) ?? false) ||
+        (r.authorName?.toLowerCase().includes(query) ?? false) ||
+        (r.topic?.toLowerCase().includes(query) ?? false)
     )
   },
 
@@ -25,6 +27,13 @@ export const reportService = {
   async deleteReport(id: string): Promise<void> {
     await delay(100)
     reports = reports.filter((r) => r.id !== id)
+  },
+
+  async updateReport(report: ResearchReport): Promise<ResearchReport> {
+    await delay(200)
+    const updated = { ...report, updatedAt: new Date().toISOString() }
+    reports = reports.map((r) => (r.id === report.id ? updated : r))
+    return updated
   },
 
   // For internal use - adds report from agent

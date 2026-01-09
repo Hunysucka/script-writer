@@ -2,9 +2,14 @@ import { useState, useMemo } from 'react'
 import { useAppContext } from '@/hooks'
 import { Card } from '@/components/ui/Card'
 import { Input } from '@/components/ui/Input'
+import { MarkdownEditor } from '@/components/ui/MarkdownEditor'
 import type { ResearchReport, Script } from '@/types'
 
 type Tab = 'reports' | 'scripts'
+
+function isReport(item: ResearchReport | Script): item is ResearchReport {
+  return 'researchType' in item
+}
 
 export function CatalogsPage() {
   const { state, dispatch } = useAppContext()
@@ -17,7 +22,9 @@ export function CatalogsPage() {
     return state.reports.filter(
       (r) =>
         r.title.toLowerCase().includes(query) ||
-        r.topic.toLowerCase().includes(query)
+        (r.bookTitle?.toLowerCase().includes(query) ?? false) ||
+        (r.authorName?.toLowerCase().includes(query) ?? false) ||
+        (r.topic?.toLowerCase().includes(query) ?? false)
     )
   }, [state.reports, search])
 
@@ -37,6 +44,12 @@ export function CatalogsPage() {
       dispatch({ type: 'DELETE_SCRIPT', payload: id })
     }
     setSelectedItem(null)
+  }
+
+  const getReportSubject = (report: ResearchReport): string => {
+    if (report.researchType === 'book') return report.bookTitle || ''
+    if (report.researchType === 'author') return report.authorName || ''
+    return report.topic || ''
   }
 
   return (
@@ -93,12 +106,17 @@ export function CatalogsPage() {
               >
                 <div className="flex items-start justify-between">
                   <div>
-                    <h3 className="font-medium text-gray-900">{report.title}</h3>
+                    <div className="flex items-center gap-2">
+                      <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600">
+                        {report.researchType}
+                      </span>
+                      <h3 className="font-medium text-gray-900">{report.title}</h3>
+                    </div>
                     <p className="mt-1 line-clamp-2 text-sm text-gray-600">
                       {report.summary}
                     </p>
                   </div>
-                  <span className="text-xs text-gray-400">
+                  <span className="ml-4 shrink-0 text-xs text-gray-400">
                     {new Date(report.createdAt).toLocaleDateString()}
                   </span>
                 </div>
@@ -129,7 +147,7 @@ export function CatalogsPage() {
                     </span>
                   </div>
                 </div>
-                <span className="text-xs text-gray-400">
+                <span className="ml-4 shrink-0 text-xs text-gray-400">
                   {new Date(script.updatedAt).toLocaleDateString()}
                 </span>
               </div>
@@ -145,13 +163,20 @@ export function CatalogsPage() {
           onClick={() => setSelectedItem(null)}
         >
           <div
-            className="max-h-[80vh] w-full max-w-2xl overflow-y-auto rounded-xl bg-white p-6"
+            className="max-h-[90vh] w-full max-w-4xl overflow-y-auto rounded-xl bg-white p-6"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="mb-4 flex items-start justify-between">
-              <h2 className="text-xl font-semibold text-gray-900">
-                {selectedItem.title}
-              </h2>
+              <div>
+                <h2 className="text-xl font-semibold text-gray-900">
+                  {selectedItem.title}
+                </h2>
+                {isReport(selectedItem) && (
+                  <p className="mt-1 text-sm text-gray-500">
+                    {selectedItem.researchType} · {getReportSubject(selectedItem)}
+                  </p>
+                )}
+              </div>
               <button
                 type="button"
                 onClick={() => setSelectedItem(null)}
@@ -163,20 +188,22 @@ export function CatalogsPage() {
               </button>
             </div>
 
-            {'topic' in selectedItem ? (
+            {isReport(selectedItem) ? (
               // Report detail
               <div className="space-y-4">
                 <div>
-                  <span className="text-sm font-medium text-gray-500">Topic</span>
-                  <p className="text-gray-900">{selectedItem.topic}</p>
-                </div>
-                <div>
                   <span className="text-sm font-medium text-gray-500">Summary</span>
-                  <p className="text-gray-900">{selectedItem.summary}</p>
+                  <p className="mt-1 text-gray-900">{selectedItem.summary}</p>
                 </div>
                 <div>
                   <span className="text-sm font-medium text-gray-500">Content</span>
-                  <p className="whitespace-pre-wrap text-gray-900">{selectedItem.content}</p>
+                  <div className="mt-2">
+                    <MarkdownEditor
+                      value={selectedItem.content}
+                      onChange={() => {}}
+                      readOnly
+                    />
+                  </div>
                 </div>
                 {selectedItem.sources.length > 0 && (
                   <div>
@@ -202,11 +229,11 @@ export function CatalogsPage() {
                 </div>
                 <div>
                   <span className="text-sm font-medium text-gray-500">Prompt</span>
-                  <p className="text-gray-900">{selectedItem.prompt}</p>
+                  <p className="mt-1 text-gray-900">{selectedItem.prompt}</p>
                 </div>
                 <div>
                   <span className="text-sm font-medium text-gray-500">Script</span>
-                  <pre className="mt-1 whitespace-pre-wrap rounded-lg bg-gray-50 p-4 text-sm text-gray-900">
+                  <pre className="mt-2 whitespace-pre-wrap rounded-lg bg-gray-50 p-4 text-sm text-gray-900">
                     {selectedItem.content}
                   </pre>
                 </div>
@@ -216,10 +243,17 @@ export function CatalogsPage() {
             <div className="mt-6 flex justify-end gap-2">
               <button
                 type="button"
+                onClick={() => navigator.clipboard.writeText(selectedItem.content)}
+                className="rounded-lg px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100"
+              >
+                Copy Content
+              </button>
+              <button
+                type="button"
                 onClick={() =>
                   handleDelete(
                     selectedItem.id,
-                    'topic' in selectedItem ? 'report' : 'script'
+                    isReport(selectedItem) ? 'report' : 'script'
                   )
                 }
                 className="rounded-lg px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50"

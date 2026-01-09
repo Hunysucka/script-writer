@@ -1,15 +1,27 @@
 export type AgentStatus = 'idle' | 'running' | 'completed' | 'failed'
 export type ScriptPlatform = 'youtube' | 'instagram' | 'both'
+export type ResearchType = 'book' | 'author' | 'topic'
+
+export interface ResearchInput {
+  type: ResearchType
+  bookTitle?: string
+  authorName?: string
+  topic?: string
+}
 
 export interface ResearchReport {
   id: string
   title: string
-  topic: string
-  content: string
+  researchType: ResearchType
+  bookTitle?: string
+  authorName?: string
+  topic?: string
+  content: string // Markdown content
   summary: string
   sources: string[]
   status: AgentStatus
   createdAt: string
+  updatedAt: string
 }
 
 export interface Script {
@@ -46,6 +58,7 @@ export interface AppState {
 export type AppAction =
   | { type: 'SET_REPORTS'; payload: ResearchReport[] }
   | { type: 'ADD_REPORT'; payload: ResearchReport }
+  | { type: 'UPDATE_REPORT'; payload: ResearchReport }
   | { type: 'DELETE_REPORT'; payload: string }
   | { type: 'SET_SCRIPTS'; payload: Script[] }
   | { type: 'ADD_SCRIPT'; payload: Script }
