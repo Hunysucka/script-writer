@@ -30,7 +30,7 @@ app.get('/api/health', (req, res) => {
 
 // Serve static files in production
 if (process.env.NODE_ENV === 'production') {
-  const clientDist = path.join(__dirname, '../../client-dist')
+  const clientDist = path.join(__dirname, '../client-dist')
   app.use(express.static(clientDist))
   
   // Handle client-side routing - serve index.html for all non-API routes
