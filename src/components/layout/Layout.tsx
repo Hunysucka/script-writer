@@ -2,7 +2,7 @@ import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { Header } from './Header'
 import { BottomNav } from './BottomNav'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useSwipeable } from 'react-use-gesture'
+import { useDrag } from '@use-gesture/react'
 
 const pages = ['/', '/write', '/catalog']
 
@@ -11,22 +11,24 @@ export function Layout() {
   const navigate = useNavigate()
   const currentIndex = pages.indexOf(location.pathname)
 
-  const bind = useSwipeable({
-    onSwipedLeft: () => {
+  const bind = useDrag(({ swipe: [swipeX], active }) => {
+    if (active) return
+    if (swipeX === -1) {
       if (currentIndex < pages.length - 1) {
         navigate(pages[currentIndex + 1])
       }
-    },
-    onSwipedRight: () => {
+    } else if (swipeX === 1) {
       if (currentIndex > 0) {
         navigate(pages[currentIndex - 1])
       }
-    },
-    trackMouse: false,
+    }
+  }, {
+    axis: 'x',
+    filterTaps: true,
   })
 
   return (
-    <div className="min-h-screen bg-paper dark:bg-paper-dark" {...bind()}>
+    <div className="min-h-screen bg-paper dark:bg-paper-dark touch-none" {...bind()}>
       <Header />
       <main className="mx-auto max-w-3xl px-4 py-6 pb-24 sm:py-8 sm:pb-8">
         <AnimatePresence mode="wait">
