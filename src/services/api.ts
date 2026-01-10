@@ -1,4 +1,5 @@
-const API_BASE = '/api'
+// Use environment variable or default to localhost for development
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3001/api'
 
 export async function apiRequest<T>(
   endpoint: string,
@@ -13,18 +14,14 @@ export async function apiRequest<T>(
   })
 
   if (!response.ok) {
-    throw new Error(`API Error: ${response.status}`)
+    const error = await response.json().catch(() => ({ error: 'Unknown error' }))
+    throw new Error(error.error || `API Error: ${response.status}`)
+  }
+
+  // Handle 204 No Content
+  if (response.status === 204) {
+    return undefined as T
   }
 
   return response.json()
-}
-
-// Utility for simulating API delay in mock services
-export function delay(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms))
-}
-
-// Generate unique IDs for mock data
-export function generateId(): string {
-  return Math.random().toString(36).substring(2, 11)
 }

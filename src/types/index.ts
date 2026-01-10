@@ -1,4 +1,4 @@
-export type AgentStatus = 'idle' | 'running' | 'completed' | 'failed'
+export type AgentStatus = 'idle' | 'pending' | 'running' | 'completed' | 'failed'
 export type ScriptPlatform = 'youtube' | 'instagram' | 'both'
 export type ResearchType = 'book' | 'author' | 'topic'
 

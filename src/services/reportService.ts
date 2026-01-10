@@ -1,43 +1,53 @@
-import { delay } from './api'
+import { apiRequest } from './api'
 import type { ResearchReport } from '@/types'
 
-// In-memory mock storage
-let reports: ResearchReport[] = []
+// Transform MongoDB document to frontend format
+function transformReport(doc: Record<string, unknown>): ResearchReport {
+  return {
+    id: (doc._id as string) || (doc.id as string),
+    title: doc.title as string,
+    researchType: doc.researchType as ResearchReport['researchType'],
+    bookTitle: doc.bookTitle as string | undefined,
+    authorName: doc.authorName as string | undefined,
+    topic: doc.topic as string | undefined,
+    content: doc.content as string,
+    summary: doc.summary as string,
+    sources: doc.sources as string[],
+    status: 'completed',
+    createdAt: doc.createdAt as string,
+    updatedAt: doc.updatedAt as string,
+  }
+}
 
 export const reportService = {
   async getReports(search?: string): Promise<ResearchReport[]> {
-    await delay(200)
-    if (!search) return reports
-
-    const query = search.toLowerCase()
-    return reports.filter(
-      (r) =>
-        r.title.toLowerCase().includes(query) ||
-        (r.bookTitle?.toLowerCase().includes(query) ?? false) ||
-        (r.authorName?.toLowerCase().includes(query) ?? false) ||
-        (r.topic?.toLowerCase().includes(query) ?? false)
-    )
+    const endpoint = search ? `/reports?search=${encodeURIComponent(search)}` : '/reports'
+    const docs = await apiRequest<Record<string, unknown>[]>(endpoint)
+    return docs.map(transformReport)
   },
 
   async getReport(id: string): Promise<ResearchReport | null> {
-    await delay(100)
-    return reports.find((r) => r.id === id) || null
+    try {
+      const doc = await apiRequest<Record<string, unknown>>(`/reports/${id}`)
+      return transformReport(doc)
+    } catch {
+      return null
+    }
   },
 
   async deleteReport(id: string): Promise<void> {
-    await delay(100)
-    reports = reports.filter((r) => r.id !== id)
+    await apiRequest(`/reports/${id}`, { method: 'DELETE' })
   },
 
   async updateReport(report: ResearchReport): Promise<ResearchReport> {
-    await delay(200)
-    const updated = { ...report, updatedAt: new Date().toISOString() }
-    reports = reports.map((r) => (r.id === report.id ? updated : r))
-    return updated
-  },
-
-  // For internal use - adds report from agent
-  addReport(report: ResearchReport): void {
-    reports = [report, ...reports]
+    const doc = await apiRequest<Record<string, unknown>>(`/reports/${report.id}`, {
+      method: 'PATCH',
+      body: JSON.stringify({
+        title: report.title,
+        content: report.content,
+        summary: report.summary,
+      }),
+    })
+    return transformReport(doc)
   },
 }

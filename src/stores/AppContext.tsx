@@ -1,28 +1,33 @@
 import { useReducer, useEffect, type ReactNode } from 'react'
 import { appReducer, initialState } from './appReducer'
 import { AppContext } from './context'
-import { storage } from '@/utils/storage'
-
-function getInitialState() {
-  return {
-    ...initialState,
-    reports: storage.getReports(),
-    scripts: storage.getScripts(),
-  }
-}
+import { reportService } from '@/services/reportService'
+import { scriptService } from '@/services/scriptService'
 
 export function AppProvider({ children }: { children: ReactNode }) {
-  const [state, dispatch] = useReducer(appReducer, undefined, getInitialState)
+  const [state, dispatch] = useReducer(appReducer, initialState)
 
-  // Persist reports to localStorage
+  // Load data from API on mount
   useEffect(() => {
-    storage.setReports(state.reports)
-  }, [state.reports])
+    async function loadData() {
+      dispatch({ type: 'SET_LOADING', payload: true })
+      try {
+        const [reports, scripts] = await Promise.all([
+          reportService.getReports(),
+          scriptService.getScripts(),
+        ])
+        dispatch({ type: 'SET_REPORTS', payload: reports })
+        dispatch({ type: 'SET_SCRIPTS', payload: scripts })
+      } catch (error) {
+        console.error('Failed to load data:', error)
+        dispatch({ type: 'SET_ERROR', payload: 'Failed to load data from server' })
+      } finally {
+        dispatch({ type: 'SET_LOADING', payload: false })
+      }
+    }
 
-  // Persist scripts to localStorage
-  useEffect(() => {
-    storage.setScripts(state.scripts)
-  }, [state.scripts])
+    loadData()
+  }, [])
 
   return (
     <AppContext.Provider value={{ state, dispatch }}>

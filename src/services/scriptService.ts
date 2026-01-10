@@ -1,8 +1,5 @@
-import { delay, generateId } from './api'
+import { apiRequest } from './api'
 import type { Script, ScriptPlatform } from '@/types'
-
-// In-memory mock storage
-let scripts: Script[] = []
 
 interface GenerateScriptParams {
   reportIds: string[]
@@ -10,94 +7,84 @@ interface GenerateScriptParams {
   platform: ScriptPlatform
 }
 
-// Generate mock script content
-function generateMockScriptContent(
-  platform: ScriptPlatform,
-  prompt: string
-): string {
-  const platformNote =
-    platform === 'youtube'
-      ? '(YouTube Short - 60 sec max)'
-      : platform === 'instagram'
-        ? '(Instagram Reel - 90 sec max)'
-        : '(Multi-platform - 60 sec)'
-
-  return `SCRIPT ${platformNote}
-
-[HOOK - 0:00-0:03]
-"Did you know this about ${prompt.slice(0, 30)}...?"
-
-[INTRO - 0:03-0:10]
-Quick introduction to the topic.
-Keep it punchy and engaging.
-
-[MAIN CONTENT - 0:10-0:45]
-Point 1: Key insight from research
-- Visual: Show relevant b-roll
-- Text overlay: Highlight stat
-
-Point 2: Surprising fact
-- Transition: Quick cut
-- Audio: Sound effect
-
-Point 3: Actionable takeaway
-- CTA setup
-
-[OUTRO - 0:45-0:60]
-"Follow for more content like this!"
-Point to follow button
-End with call-to-action
-
----
-Notes: ${prompt}`
+// Transform MongoDB document to frontend format
+function transformScript(doc: Record<string, unknown>): Script {
+  return {
+    id: (doc._id as string) || (doc.id as string),
+    title: doc.title as string,
+    content: doc.content as string,
+    platform: doc.platform as ScriptPlatform,
+    reportIds: doc.reportIds as string[],
+    prompt: doc.prompt as string,
+    status: doc.status as 'draft' | 'final',
+    createdAt: doc.createdAt as string,
+    updatedAt: doc.updatedAt as string,
+  }
 }
 
 export const scriptService = {
   async generateScript(params: GenerateScriptParams): Promise<Script> {
-    await delay(2000) // Simulate AI generation time
+    // Start the script generation job
+    const response = await apiRequest<{ jobId: string }>('/agents/script', {
+      method: 'POST',
+      body: JSON.stringify(params),
+    })
 
-    const script: Script = {
-      id: generateId(),
-      title: `Script: ${params.prompt.slice(0, 40)}...`,
-      content: generateMockScriptContent(params.platform, params.prompt),
-      platform: params.platform,
-      reportIds: params.reportIds,
-      prompt: params.prompt,
-      status: 'draft',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+    // Poll for completion
+    let attempts = 0
+    const maxAttempts = 60 // 60 seconds max
+
+    while (attempts < maxAttempts) {
+      await new Promise((resolve) => setTimeout(resolve, 1000))
+
+      const status = await apiRequest<{
+        status: string
+        result?: Record<string, unknown>
+        error?: string
+      }>(`/agents/${response.jobId}/status`)
+
+      if (status.status === 'completed' && status.result) {
+        return transformScript(status.result)
+      }
+
+      if (status.status === 'failed') {
+        throw new Error(status.error || 'Script generation failed')
+      }
+
+      attempts++
     }
 
-    scripts = [script, ...scripts]
-    return script
+    throw new Error('Script generation timed out')
   },
 
   async getScripts(search?: string): Promise<Script[]> {
-    await delay(200)
-    if (!search) return scripts
-
-    const query = search.toLowerCase()
-    return scripts.filter(
-      (s) =>
-        s.title.toLowerCase().includes(query) ||
-        s.content.toLowerCase().includes(query)
-    )
+    const endpoint = search ? `/scripts?search=${encodeURIComponent(search)}` : '/scripts'
+    const docs = await apiRequest<Record<string, unknown>[]>(endpoint)
+    return docs.map(transformScript)
   },
 
   async getScript(id: string): Promise<Script | null> {
-    await delay(100)
-    return scripts.find((s) => s.id === id) || null
+    try {
+      const doc = await apiRequest<Record<string, unknown>>(`/scripts/${id}`)
+      return transformScript(doc)
+    } catch {
+      return null
+    }
   },
 
   async updateScript(script: Script): Promise<Script> {
-    await delay(200)
-    const updated = { ...script, updatedAt: new Date().toISOString() }
-    scripts = scripts.map((s) => (s.id === script.id ? updated : s))
-    return updated
+    const doc = await apiRequest<Record<string, unknown>>(`/scripts/${script.id}`, {
+      method: 'PATCH',
+      body: JSON.stringify({
+        title: script.title,
+        content: script.content,
+        status: script.status,
+      }),
+    })
+    return transformScript(doc)
   },
 
   async deleteScript(id: string): Promise<void> {
-    await delay(100)
-    scripts = scripts.filter((s) => s.id !== id)
+    await apiRequest(`/scripts/${id}`, { method: 'DELETE' })
   },
 }
