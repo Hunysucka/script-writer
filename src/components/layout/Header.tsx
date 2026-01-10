@@ -105,26 +105,39 @@ export function Header() {
         </div>
       </div>
 
+      {/* Backdrop overlay */}
+      <div
+        className={clsx(
+          'fixed inset-0 z-40 bg-black/30 backdrop-blur-sm transition-opacity duration-200 sm:hidden',
+          mobileMenuOpen ? 'opacity-100' : 'pointer-events-none opacity-0'
+        )}
+        onClick={() => setMobileMenuOpen(false)}
+        aria-hidden="true"
+      />
+
       {/* Mobile nav */}
-      {mobileMenuOpen && (
-        <nav className="border-t border-accent-200 px-4 py-3 dark:border-accent-800 sm:hidden">
-          {navItems.map((item) => (
-            <Link
-              key={item.path}
-              to={item.path}
-              onClick={() => setMobileMenuOpen(false)}
-              className={clsx(
-                'block min-h-[48px] rounded-md px-4 py-3 text-base font-medium transition-colors',
-                location.pathname === item.path
-                  ? 'bg-accent-100 text-accent-700 dark:bg-accent-800 dark:text-accent-200'
-                  : 'text-accent-600 hover:bg-accent-50 dark:text-accent-400 dark:hover:bg-accent-900/50'
-              )}
-            >
-              {item.label}
-            </Link>
-          ))}
-        </nav>
-      )}
+      <nav
+        className={clsx(
+          'overflow-hidden border-t border-accent-200 px-4 transition-all duration-200 ease-out dark:border-accent-800 sm:hidden',
+          mobileMenuOpen ? 'max-h-48 py-3 opacity-100' : 'max-h-0 py-0 opacity-0'
+        )}
+      >
+        {navItems.map((item) => (
+          <Link
+            key={item.path}
+            to={item.path}
+            onClick={() => setMobileMenuOpen(false)}
+            className={clsx(
+              'block min-h-[48px] rounded-md px-4 py-3 text-base font-medium transition-colors',
+              location.pathname === item.path
+                ? 'bg-accent-100 text-accent-700 dark:bg-accent-800 dark:text-accent-200'
+                : 'text-accent-600 hover:bg-accent-50 dark:text-accent-400 dark:hover:bg-accent-900/50'
+            )}
+          >
+            {item.label}
+          </Link>
+        ))}
+      </nav>
     </header>
   )
 }
