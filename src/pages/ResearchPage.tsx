@@ -135,8 +135,8 @@ export function ResearchPage() {
         </div>
 
         <div>
-          <h1 className="font-serif text-3xl font-semibold text-ink dark:text-ink-light sm:text-2xl">{viewingReport.title}</h1>
-          <p className="mt-2 text-base italic text-accent-500 dark:text-accent-400 sm:text-sm">
+          <h1 className="font-serif text-3xl font-semibold text-ink dark:text-accent-400 sm:text-2xl">{viewingReport.title}</h1>
+          <p className="mt-2 text-base italic text-accent-500 dark:text-accent-500 sm:text-sm">
             {viewingReport.researchType === 'book' && viewingReport.bookTitle}
             {viewingReport.researchType === 'author' && viewingReport.authorName}
             {viewingReport.researchType === 'topic' && viewingReport.topic}
@@ -276,7 +276,7 @@ export function ResearchPage() {
       {/* Recent Reports */}
       {(isInitialLoad || state.reports.length > 0) && (
         <div className="space-y-5">
-          <h2 className="font-serif text-2xl font-semibold text-ink dark:text-ink-light sm:text-xl">Recent Reports</h2>
+          <h2 className="font-serif text-2xl font-semibold text-ink dark:text-accent-400 sm:text-xl">Recent Reports</h2>
           {isInitialLoad ? (
             <>
               <SkeletonCard />
@@ -295,7 +295,7 @@ export function ResearchPage() {
                       <span className="rounded-full bg-accent-100 px-3 py-1 text-sm font-medium text-accent-700 dark:bg-accent-800 dark:text-accent-300 sm:px-2 sm:py-0.5 sm:text-xs">
                         {report.researchType}
                       </span>
-                      <h3 className="font-serif text-lg font-medium text-ink dark:text-ink-light sm:text-base">{report.title}</h3>
+                      <h3 className="font-serif text-lg font-medium text-ink dark:text-accent-300 sm:text-base">{report.title}</h3>
                     </div>
                     <p className="mt-2 line-clamp-2 text-base leading-relaxed text-accent-600 dark:text-accent-400 sm:mt-1 sm:text-sm">{report.summary}</p>
                   </div>
