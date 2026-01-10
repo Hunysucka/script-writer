@@ -38,3 +38,8 @@ outputType = "webview"
 task = "shell.exec"
 args = "cd server && npm run dev & npm run dev"
 waitForPort = 5000
+
+[userenv]
+
+[userenv.shared]
+AI_PROVIDER = "anthropic"
