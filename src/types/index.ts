@@ -7,7 +7,6 @@ export interface ResearchInput {
   bookTitle?: string
   authorName?: string
   topic?: string
-  focusTopics?: string[]
 }
 
 export interface ResearchReport {

@@ -18,7 +18,6 @@ export function ResearchPage() {
   const [viewingReport, setViewingReport] = useState<ResearchReport | null>(null)
   const [editedContent, setEditedContent] = useState('')
   const [isInitialLoad, setIsInitialLoad] = useState(true)
-  const [focusTopics, setFocusTopics] = useState('')
 
   useEffect(() => {
     const timer = setTimeout(() => setIsInitialLoad(false), 300)
@@ -31,9 +30,6 @@ export function ResearchPage() {
       bookTitle: researchType === 'book' ? bookTitle : undefined,
       authorName: researchType === 'book' || researchType === 'author' ? authorName : undefined,
       topic: researchType === 'topic' ? topic : undefined,
-      focusTopics: researchType === 'author' && focusTopics.trim()
-        ? focusTopics.split(',').map(t => t.trim()).filter(Boolean)
-        : undefined,
     }
 
     // Validate input
@@ -45,7 +41,7 @@ export function ResearchPage() {
       const job = await agentService.startResearch(input)
       dispatch({ type: 'SET_ACTIVE_JOB', payload: job })
 
-      // Poll for progress every 2 seconds
+      // Poll for progress
       const pollInterval = setInterval(async () => {
         const status = await agentService.getJobStatus(job.id)
         dispatch({
@@ -62,16 +58,15 @@ export function ResearchPage() {
             setEditedContent(report.content)
             toast.success('Research complete!')
           } else if (status.status === 'failed') {
-            toast.error(status.error || 'Research failed. Please try again.')
+            toast.error('Research failed. Please try again.')
           }
           dispatch({ type: 'SET_ACTIVE_JOB', payload: null })
           // Clear form
           setBookTitle('')
           setAuthorName('')
           setTopic('')
-          setFocusTopics('')
         }
-      }, 2000)
+      }, 500)
     } catch {
       dispatch({ type: 'SET_ERROR', payload: 'Failed to start research' })
       toast.error('Failed to start research')
@@ -114,29 +109,6 @@ export function ResearchPage() {
     if (researchType === 'book') return bookTitle || 'book'
     if (researchType === 'author') return authorName || 'author'
     return topic || 'topic'
-  }
-
-  const getProgressStage = (progress: number, type: ResearchType): string => {
-    if (type === 'book') {
-      if (progress < 30) return 'Analyzing book structure and thesis...'
-      if (progress < 50) return 'Extracting key concepts and arguments...'
-      if (progress < 80) return 'Compiling quotes and critical assessment...'
-      return 'Finalizing report...'
-    }
-    if (type === 'author') {
-      if (progress < 15) return 'Searching web for author information...'
-      if (progress < 30) return 'Finding interviews and talks on YouTube...'
-      if (progress < 45) return 'Fetching video transcripts...'
-      if (progress < 60) return 'Analyzing perspectives and quotes...'
-      if (progress < 85) return 'Synthesizing intellectual profile...'
-      return 'Finalizing report...'
-    }
-    // topic
-    if (progress < 15) return 'Searching authoritative sources...'
-    if (progress < 40) return 'Gathering information from experts...'
-    if (progress < 60) return 'Analyzing key concepts...'
-    if (progress < 85) return 'Synthesizing comprehensive primer...'
-    return 'Finalizing report...'
   }
 
   // If viewing a report, show the editor
@@ -251,25 +223,13 @@ export function ResearchPage() {
           )}
 
           {researchType === 'author' && (
-            <div className="space-y-3">
-              <Input
-                label="Author Name"
-                placeholder="e.g., Ludwig von Mises"
-                value={authorName}
-                onChange={(e) => setAuthorName(e.target.value)}
-                disabled={isResearching}
-              />
-              <Input
-                label="Focus Topics (optional)"
-                placeholder="e.g., inflation, monetary policy, free markets"
-                value={focusTopics}
-                onChange={(e) => setFocusTopics(e.target.value)}
-                disabled={isResearching}
-              />
-              <p className="text-sm text-accent-500 dark:text-accent-500">
-                Comma-separated topics to focus the research on specific areas
-              </p>
-            </div>
+            <Input
+              label="Author Name"
+              placeholder="e.g., Ludwig von Mises"
+              value={authorName}
+              onChange={(e) => setAuthorName(e.target.value)}
+              disabled={isResearching}
+            />
           )}
 
           {researchType === 'topic' && (
@@ -307,7 +267,7 @@ export function ResearchPage() {
               />
             </div>
             <p className="text-sm italic text-accent-500 dark:text-accent-500 sm:text-xs">
-              {getProgressStage(activeJob.progress, researchType)}
+              Gathering information, analyzing sources, writing report...
             </p>
           </div>
         </Card>

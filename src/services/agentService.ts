@@ -11,42 +11,8 @@ interface JobStatusResponse {
   type: 'research' | 'script'
   status: AgentStatus
   progress: number
-  result?: Record<string, unknown>
+  result?: ResearchReport | Script
   error?: string
-}
-
-// Transform MongoDB document to frontend format
-function transformResult(result: Record<string, unknown>, type: 'research' | 'script'): ResearchReport | Script {
-  const id = (result._id as string) || (result.id as string)
-
-  if (type === 'research') {
-    return {
-      id,
-      title: result.title as string,
-      researchType: result.researchType as ResearchReport['researchType'],
-      bookTitle: result.bookTitle as string | undefined,
-      authorName: result.authorName as string | undefined,
-      topic: result.topic as string | undefined,
-      content: result.content as string,
-      summary: result.summary as string,
-      sources: (result.sources as string[]) || [],
-      status: 'completed',
-      createdAt: result.createdAt as string,
-      updatedAt: result.updatedAt as string,
-    } as ResearchReport
-  }
-
-  return {
-    id,
-    title: result.title as string,
-    content: result.content as string,
-    platform: result.platform as Script['platform'],
-    reportIds: (result.reportIds as string[]) || [],
-    prompt: result.prompt as string,
-    status: result.status as Script['status'],
-    createdAt: result.createdAt as string,
-    updatedAt: result.updatedAt as string,
-  } as Script
 }
 
 export const agentService = {
@@ -73,7 +39,7 @@ export const agentService = {
       type: response.type,
       status: response.status,
       progress: response.progress,
-      result: response.result ? transformResult(response.result, response.type) : undefined,
+      result: response.result,
       error: response.error,
       startedAt: new Date().toISOString(),
       ...(response.status === 'completed' || response.status === 'failed'
