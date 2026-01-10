@@ -132,7 +132,7 @@ export function CatalogsPage() {
                       <span className="rounded-full bg-accent-100 px-3 py-1 text-sm font-medium text-accent-700 dark:bg-accent-800 dark:text-accent-300 sm:px-2 sm:py-0.5 sm:text-xs">
                         {report.researchType}
                       </span>
-                      <h3 className="font-serif text-lg font-medium text-ink dark:text-ink-light sm:text-base">{report.title}</h3>
+                      <h3 className="font-serif text-lg font-medium text-ink dark:text-accent-300 sm:text-base">{report.title}</h3>
                     </div>
                     <p className="mt-2 line-clamp-2 text-base leading-relaxed text-accent-600 dark:text-accent-400 sm:mt-1 sm:text-sm">
                       {report.summary}
@@ -156,7 +156,7 @@ export function CatalogsPage() {
             >
               <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <div className="flex-1">
-                  <h3 className="font-serif text-lg font-medium text-ink dark:text-ink-light sm:text-base">{script.title}</h3>
+                  <h3 className="font-serif text-lg font-medium text-ink dark:text-accent-300 sm:text-base">{script.title}</h3>
                   <p className="mt-2 line-clamp-2 text-base leading-relaxed text-accent-600 dark:text-accent-400 sm:mt-1 sm:text-sm">
                     {script.content}
                   </p>
@@ -190,7 +190,7 @@ export function CatalogsPage() {
           >
             <div className="mb-6 flex items-start justify-between">
               <div>
-                <h2 className="font-serif text-2xl font-semibold text-ink dark:text-ink-light">
+                <h2 className="font-serif text-2xl font-semibold text-ink dark:text-accent-400">
                   {selectedItem.title}
                 </h2>
                 {isReport(selectedItem) && (

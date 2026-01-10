@@ -84,7 +84,7 @@ export function ScriptWriterPage() {
 
       {/* Report Selection */}
       <Card>
-        <h2 className="mb-4 font-serif text-xl font-medium text-ink dark:text-ink-light sm:mb-3 sm:text-lg">Select Reports</h2>
+        <h2 className="mb-4 font-serif text-xl font-medium text-ink dark:text-accent-400 sm:mb-3 sm:text-lg">Select Reports</h2>
         {isInitialLoad ? (
           <div className="space-y-3 sm:space-y-2">
             <SkeletonReportCheckbox />
@@ -108,7 +108,7 @@ export function ScriptWriterPage() {
                   className="h-5 w-5 rounded border-accent-300 text-accent-500 focus:ring-accent-500 dark:border-accent-600 dark:bg-accent-900 sm:h-4 sm:w-4"
                 />
                 <div className="flex-1">
-                  <p className="font-serif text-base font-medium text-ink dark:text-ink-light sm:text-sm">{report.title}</p>
+                  <p className="font-serif text-base font-medium text-ink dark:text-accent-300 sm:text-sm">{report.title}</p>
                   <p className="text-sm text-accent-500 dark:text-accent-400 sm:text-xs">{getReportSubtitle(report)}</p>
                 </div>
               </label>
