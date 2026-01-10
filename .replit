@@ -8,10 +8,6 @@ externalPort = 3001
 localPort = 5000
 externalPort = 80
 
-[[ports]]
-localPort = 5173
-externalPort = 5173
-
 [agent]
 expertMode = true
 
@@ -25,10 +21,10 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "Start application"
+args = "Dev Server"
 
 [[workflows.workflow]]
-name = "Start application"
+name = "Dev Server"
 author = "agent"
 
 [workflows.workflow.metadata]
@@ -36,7 +32,7 @@ outputType = "webview"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "cd server && npm run dev & npm run dev"
+args = "npm run dev:all"
 waitForPort = 5000
 
 [userenv]
@@ -48,3 +44,6 @@ AI_PROVIDER = "anthropic"
 deploymentTarget = "autoscale"
 run = ["npm", "start"]
 build = ["npm", "run", "build:all"]
+
+[nix]
+channel = "stable-25_05"
