@@ -24,3 +24,5 @@ server/dist
 *.njsproj
 *.sln
 *.sw?
+.claude-user
+.claude-user/**
