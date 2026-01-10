@@ -16,7 +16,8 @@ export interface ResearchReport {
   bookTitle?: string
   authorName?: string
   topic?: string
-  content: string // Markdown content
+  content: string // Human-readable markdown content
+  structuredContent?: Record<string, unknown> // JSON for AI consumption
   summary: string
   sources: string[]
   status: AgentStatus

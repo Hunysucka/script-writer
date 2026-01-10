@@ -9,6 +9,7 @@ export interface IReport extends Document {
   authorName?: string
   topic?: string
   content: string
+  structuredContent?: Record<string, unknown>
   summary: string
   sources: string[]
   createdAt: Date
@@ -27,6 +28,7 @@ const reportSchema = new Schema<IReport>(
     authorName: { type: String },
     topic: { type: String },
     content: { type: String, required: true },
+    structuredContent: { type: Schema.Types.Mixed },
     summary: { type: String, required: true },
     sources: [{ type: String }],
   },
