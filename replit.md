@@ -50,6 +50,7 @@ Preferred communication style: Simple, everyday language.
 ### Database
 - **MongoDB**: Primary data store via Mongoose ODM
 - **Models**: Report (research documents) and Script (generated scripts)
+- **Dual-Format Reports**: Reports store both `content` (human-readable markdown) and `structuredContent` (JSON for AI consumption). This allows users to read nicely formatted reports while the AI agent can efficiently parse structured data for script generation. Legacy reports with JSON-only content are automatically migrated on fetch.
 
 ### AI Services
 - **Anthropic Claude API**: Primary AI provider for research and script generation
