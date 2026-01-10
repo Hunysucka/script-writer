@@ -13,7 +13,7 @@ export class AnthropicProvider implements AIProvider {
 
   async complete(prompt: string, options?: AIOptions): Promise<string> {
     const response = await this.client.messages.create({
-      model: 'claude-sonnet-4-20250514',
+      model: 'claude-sonnet-4-5-20250929',
       max_tokens: options?.maxTokens || 4096,
       messages: [{ role: 'user', content: prompt }],
     })

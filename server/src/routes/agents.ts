@@ -1,36 +1,53 @@
 import { Router, type Request, type Response } from 'express'
-import { startResearch } from '../services/research.js'
+import { startBookResearch } from '../services/agents/bookAgent.js'
+import { startAuthorResearch } from '../services/agents/authorAgent.js'
+import { startTopicResearch } from '../services/agents/topicAgent.js'
 import { startScriptGeneration } from '../services/scriptGen.js'
 import { getJob } from '../jobs/jobManager.js'
 import { createError } from '../middleware/errorHandler.js'
 
 const router = Router()
 
-// Start research job
+// Start research job - routes to specialized agents
 router.post('/research', async (req: Request, res: Response) => {
-  const { type, bookTitle, authorName, topic } = req.body
+  const { type, bookTitle, authorName, topic, focusTopics } = req.body
 
   if (!type || !['book', 'author', 'topic'].includes(type)) {
-    throw createError('Invalid research type', 400)
+    throw createError('Invalid research type. Must be: book, author, or topic', 400)
   }
 
-  if (type === 'book' && !bookTitle) {
-    throw createError('Book title is required', 400)
-  }
+  let job
 
-  if (type === 'author' && !authorName) {
-    throw createError('Author name is required', 400)
-  }
+  switch (type) {
+    case 'book':
+      if (!bookTitle) {
+        throw createError('Book title is required for book research', 400)
+      }
+      job = await startBookResearch({ bookTitle, authorName })
+      break
 
-  if (type === 'topic' && !topic) {
-    throw createError('Topic is required', 400)
-  }
+    case 'author':
+      if (!authorName) {
+        throw createError('Author name is required for author research', 400)
+      }
+      job = await startAuthorResearch({ authorName, focusTopics })
+      break
 
-  const job = await startResearch({ type, bookTitle, authorName, topic })
+    case 'topic':
+      if (!topic) {
+        throw createError('Topic is required for topic research', 400)
+      }
+      job = await startTopicResearch({ topic })
+      break
+
+    default:
+      throw createError('Invalid research type', 400)
+  }
 
   res.status(202).json({
     jobId: job.id,
     status: job.status,
+    type: type,
   })
 })
 
