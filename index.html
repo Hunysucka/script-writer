@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Particle Face Simulator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0a0a0f;
+            overflow: hidden;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        // Configuration
+        const TOTAL_PARTICLES = 9000;
+        const EXPLOSION_DELAY = 2500;
+        const RETURN_DELAY = 2500;
+        const COLOR_RETURN_INTERVAL = 1000;
+
+        // Explosion colors
+        const EXPLOSION_COLORS = [
+            { name: 'purple', hue: 280, sat: 70, light: 60 },
+            { name: 'pink', hue: 330, sat: 80, light: 65 },
+            { name: 'lightBlue', hue: 195, sat: 75, light: 65 },
+            { name: 'green', hue: 140, sat: 65, light: 55 }
+        ];
+
+        // State
+        let particles = [];
+        let animationPhase = 'floating';
+        let explosionStartTime = null;
+        let returnStartTime = null;
+        let currentReturnColorIndex = -1;
+
+        // Resize canvas
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        // Particle class
+        class Particle {
+            constructor(x, y, isTopOfHead = false, colorIndex = 0) {
+                this.originalX = x;
+                this.originalY = y;
+                this.x = x;
+                this.y = y;
+                this.isTopOfHead = isTopOfHead;
+                this.colorIndex = colorIndex;
+
+                // Blue shades for face
+                this.baseHue = 210 + Math.random() * 30 - 15;
+                this.baseSat = 60 + Math.random() * 30;
+                this.baseLight = 45 + Math.random() * 25;
+
+                // Current color (starts as blue)
+                this.hue = this.baseHue;
+                this.sat = this.baseSat;
+                this.light = this.baseLight;
+
+                // Explosion color (assigned to top-of-head particles)
+                if (isTopOfHead) {
+                    const explosionColor = EXPLOSION_COLORS[colorIndex];
+                    this.explosionHue = explosionColor.hue + Math.random() * 20 - 10;
+                    this.explosionSat = explosionColor.sat + Math.random() * 20 - 10;
+                    this.explosionLight = explosionColor.light + Math.random() * 15 - 7;
+                }
+
+                // Floating animation
+                this.floatOffsetX = Math.random() * Math.PI * 2;
+                this.floatOffsetY = Math.random() * Math.PI * 2;
+                this.floatSpeedX = 0.3 + Math.random() * 0.4;
+                this.floatSpeedY = 0.4 + Math.random() * 0.5;
+                this.floatAmplitudeX = 1 + Math.random() * 2;
+                this.floatAmplitudeY = 1 + Math.random() * 2;
+
+                // Explosion velocity
+                this.vx = 0;
+                this.vy = 0;
+
+                // Size
+                this.size = 1.5 + Math.random() * 1.5;
+
+                // State
+                this.isExploded = false;
+                this.isReturning = false;
+                this.hasReturned = false;
+
+                // Alpha
+                this.alpha = 0.7 + Math.random() * 0.3;
+            }
+
+            explode(centerX, centerY) {
+                if (!this.isTopOfHead) return;
+
+                this.isExploded = true;
+
+                // Calculate explosion direction (away from center)
+                const angle = Math.atan2(this.y - centerY, this.x - centerX) + (Math.random() - 0.5) * 0.8;
+                const speed = 8 + Math.random() * 12;
+
+                this.vx = Math.cos(angle) * speed;
+                this.vy = Math.sin(angle) * speed - Math.random() * 5;
+
+                // Change to explosion color
+                this.hue = this.explosionHue;
+                this.sat = this.explosionSat;
+                this.light = this.explosionLight;
+            }
+
+            startReturn() {
+                if (!this.isTopOfHead || !this.isExploded) return;
+                this.isReturning = true;
+            }
+
+            update(time) {
+                if (this.isExploded && !this.isReturning) {
+                    // Flying outward
+                    this.x += this.vx;
+                    this.y += this.vy;
+                    this.vy += 0.1;
+                    this.vx *= 0.99;
+                    this.vy *= 0.99;
+                } else if (this.isReturning && !this.hasReturned) {
+                    // Return to original position
+                    const dx = this.originalX - this.x;
+                    const dy = this.originalY - this.y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+
+                    if (dist < 2) {
+                        this.x = this.originalX;
+                        this.y = this.originalY;
+                        this.hasReturned = true;
+                        this.vx = 0;
+                        this.vy = 0;
+                    } else {
+                        const speed = Math.min(dist * 0.08, 15);
+                        this.vx = (dx / dist) * speed;
+                        this.vy = (dy / dist) * speed;
+                        this.x += this.vx;
+                        this.y += this.vy;
+                    }
+                } else {
+                    // Floating animation
+                    const floatX = Math.sin(time * 0.001 * this.floatSpeedX + this.floatOffsetX) * this.floatAmplitudeX;
+                    const floatY = Math.sin(time * 0.001 * this.floatSpeedY + this.floatOffsetY) * this.floatAmplitudeY;
+                    this.x = this.originalX + floatX;
+                    this.y = this.originalY + floatY;
+                }
+            }
+
+            draw(ctx) {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = `hsla(${this.hue}, ${this.sat}%, ${this.light}%, ${this.alpha})`;
+                ctx.fill();
+            }
+        }
+
+        // Generate face geometry
+        function generateFace() {
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+
+            const faceWidth = Math.min(canvas.width, canvas.height) * 0.35;
+            const faceHeight = faceWidth * 1.4;
+
+            function isInsideFace(x, y) {
+                const relX = (x - centerX) / faceWidth;
+                const relY = (y - centerY) / faceHeight;
+
+                const faceOval = (relX * relX) + (relY * relY * 0.85) < 0.95;
+
+                if (relY > 0.2) {
+                    const jawFactor = 1 - (relY - 0.2) * 0.5;
+                    const jawOval = (relX * relX / (jawFactor * jawFactor)) + (relY * relY * 0.85) < 0.95;
+                    return jawOval;
+                }
+
+                return faceOval;
+            }
+
+            function isInEyeArea(x, y) {
+                const relX = (x - centerX) / faceWidth;
+                const relY = (y - centerY) / faceHeight;
+
+                const leftEyeCenterX = -0.32;
+                const leftEyeCenterY = -0.12;
+                const eyeWidth = 0.18;
+                const eyeHeight = 0.08;
+
+                const inLeftEye = Math.pow((relX - leftEyeCenterX) / eyeWidth, 2) +
+                                  Math.pow((relY - leftEyeCenterY) / eyeHeight, 2) < 1;
+
+                const rightEyeCenterX = 0.32;
+                const inRightEye = Math.pow((relX - rightEyeCenterX) / eyeWidth, 2) +
+                                   Math.pow((relY - leftEyeCenterY) / eyeHeight, 2) < 1;
+
+                return inLeftEye || inRightEye;
+            }
+
+            function isTopOfHead(x, y) {
+                const relY = (y - centerY) / faceHeight;
+                return relY < -0.25;
+            }
+
+            function getDensityMultiplier(x, y) {
+                const relX = (x - centerX) / faceWidth;
+                const relY = (y - centerY) / faceHeight;
+
+                // Eyebrows
+                const leftBrowX = -0.32;
+                const rightBrowX = 0.32;
+                const browY = -0.22;
+                const browWidth = 0.2;
+                const browHeight = 0.04;
+
+                const inLeftBrow = Math.abs(relX - leftBrowX) < browWidth && Math.abs(relY - browY) < browHeight;
+                const inRightBrow = Math.abs(relX - rightBrowX) < browWidth && Math.abs(relY - browY) < browHeight;
+
+                if (inLeftBrow || inRightBrow) return 2.5;
+
+                // Nose ridge
+                if (Math.abs(relX) < 0.08 && relY > -0.1 && relY < 0.25) return 1.8;
+
+                // Nostrils
+                if (Math.abs(relX) < 0.12 && Math.abs(relX) > 0.03 && relY > 0.18 && relY < 0.26) return 2;
+
+                // Lips
+                if (Math.abs(relX) < 0.2 && relY > 0.35 && relY < 0.48) return 2.2;
+
+                // Cheekbones
+                if (Math.abs(relX) > 0.35 && Math.abs(relX) < 0.5 && relY > -0.05 && relY < 0.15) return 1.5;
+
+                // Jaw line
+                if (relY > 0.5 && Math.abs(relX) > 0.15) return 1.6;
+
+                return 1;
+            }
+
+            const topHeadParticles = [];
+            const faceParticles = [];
+
+            const maxAttempts = TOTAL_PARTICLES * 20;
+            let attempts = 0;
+
+            while ((topHeadParticles.length + faceParticles.length) < TOTAL_PARTICLES && attempts < maxAttempts) {
+                attempts++;
+
+                const x = centerX + (Math.random() - 0.5) * faceWidth * 2.2;
+                const y = centerY + (Math.random() - 0.5) * faceHeight * 2.2;
+
+                if (!isInsideFace(x, y)) continue;
+                if (isInEyeArea(x, y)) continue;
+
+                const density = getDensityMultiplier(x, y);
+                if (Math.random() > density / 2.5) continue;
+
+                const isTop = isTopOfHead(x, y);
+
+                if (isTop) {
+                    topHeadParticles.push({ x, y });
+                } else {
+                    faceParticles.push({ x, y });
+                }
+            }
+
+            const particlesPerColor = Math.ceil(topHeadParticles.length / EXPLOSION_COLORS.length);
+
+            // Shuffle top head particles
+            for (let i = topHeadParticles.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [topHeadParticles[i], topHeadParticles[j]] = [topHeadParticles[j], topHeadParticles[i]];
+            }
+
+            topHeadParticles.forEach((p, i) => {
+                const colorIdx = Math.floor(i / particlesPerColor) % EXPLOSION_COLORS.length;
+                particles.push(new Particle(p.x, p.y, true, colorIdx));
+            });
+
+            faceParticles.forEach(p => {
+                particles.push(new Particle(p.x, p.y, false));
+            });
+        }
+
+        // Animation loop
+        let startTime = null;
+
+        function animate(timestamp) {
+            if (!startTime) startTime = timestamp;
+            const elapsed = timestamp - startTime;
+
+            // Clear with trail effect
+            ctx.fillStyle = 'rgba(10, 10, 15, 0.15)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Phase management
+            if (animationPhase === 'floating' && elapsed >= EXPLOSION_DELAY) {
+                animationPhase = 'exploding';
+                explosionStartTime = timestamp;
+
+                const centerX = canvas.width / 2;
+                const centerY = canvas.height / 2 - canvas.height * 0.15;
+
+                particles.forEach(p => p.explode(centerX, centerY));
+            }
+
+            if (animationPhase === 'exploding' && timestamp - explosionStartTime >= RETURN_DELAY) {
+                animationPhase = 'returning';
+                returnStartTime = timestamp;
+                currentReturnColorIndex = 0;
+
+                particles.forEach(p => {
+                    if (p.isTopOfHead && p.colorIndex === 0) {
+                        p.startReturn();
+                    }
+                });
+            }
+
+            if (animationPhase === 'returning') {
+                const returnElapsed = timestamp - returnStartTime;
+                const newColorIndex = Math.floor(returnElapsed / COLOR_RETURN_INTERVAL);
+
+                if (newColorIndex > currentReturnColorIndex && newColorIndex < EXPLOSION_COLORS.length) {
+                    currentReturnColorIndex = newColorIndex;
+
+                    particles.forEach(p => {
+                        if (p.isTopOfHead && p.colorIndex === currentReturnColorIndex) {
+                            p.startReturn();
+                        }
+                    });
+                }
+
+                const allReturned = particles.every(p => !p.isTopOfHead || p.hasReturned);
+                if (allReturned && currentReturnColorIndex >= EXPLOSION_COLORS.length - 1) {
+                    animationPhase = 'reformed';
+                }
+            }
+
+            // Update and draw particles
+            particles.forEach(p => {
+                p.update(timestamp);
+                p.draw(ctx);
+            });
+
+            requestAnimationFrame(animate);
+        }
+
+        // Initialize
+        function init() {
+            particles = [];
+            animationPhase = 'floating';
+            explosionStartTime = null;
+            returnStartTime = null;
+            currentReturnColorIndex = -1;
+            startTime = null;
+
+            generateFace();
+            requestAnimationFrame(animate);
+        }
+
+        // Handle resize
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                resizeCanvas();
+                init();
+            }, 250);
+        });
+
+        // Start
+        init();
+    </script>
+</body>
+</html>
