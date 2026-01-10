@@ -2,6 +2,7 @@ import { lazy, Suspense } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { Toaster } from 'sonner'
 import { Layout } from '@/components/layout'
+import { ErrorBoundary } from '@/components/ErrorBoundary'
 
 const ResearchPage = lazy(() =>
   import('@/pages/ResearchPage').then((m) => ({ default: m.ResearchPage }))
@@ -16,24 +17,47 @@ const CatalogsPage = lazy(() =>
 function PageLoader() {
   return (
     <div className="flex min-h-[50vh] items-center justify-center">
-      <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-blue-600" />
+      <div className="h-8 w-8 animate-spin rounded-full border-4 border-accent-200 border-t-accent-500 dark:border-accent-700 dark:border-t-accent-400" />
     </div>
   )
 }
 
 export default function App() {
   return (
-    <BrowserRouter>
-      <Toaster position="bottom-right" richColors />
-      <Suspense fallback={<PageLoader />}>
-        <Routes>
-          <Route element={<Layout />}>
-            <Route path="/" element={<ResearchPage />} />
-            <Route path="/write" element={<ScriptWriterPage />} />
-            <Route path="/catalog" element={<CatalogsPage />} />
-          </Route>
-        </Routes>
-      </Suspense>
-    </BrowserRouter>
+    <ErrorBoundary>
+      <BrowserRouter>
+        <Toaster position="bottom-right" richColors />
+        <Suspense fallback={<PageLoader />}>
+          <Routes>
+            <Route element={<Layout />}>
+              <Route
+                path="/"
+                element={
+                  <ErrorBoundary>
+                    <ResearchPage />
+                  </ErrorBoundary>
+                }
+              />
+              <Route
+                path="/write"
+                element={
+                  <ErrorBoundary>
+                    <ScriptWriterPage />
+                  </ErrorBoundary>
+                }
+              />
+              <Route
+                path="/catalog"
+                element={
+                  <ErrorBoundary>
+                    <CatalogsPage />
+                  </ErrorBoundary>
+                }
+              />
+            </Route>
+          </Routes>
+        </Suspense>
+      </BrowserRouter>
+    </ErrorBoundary>
   )
 }
