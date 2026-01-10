@@ -1,6 +1,7 @@
 {
   "name": "scriptwriter-server",
   "version": "1.0.0",
+  "type": "module",
   "description": "Backend for ScriptWriter - AI-powered script generation",
   "main": "dist/index.js",
   "scripts": {
