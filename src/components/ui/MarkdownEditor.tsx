@@ -53,9 +53,9 @@ export function MarkdownEditor({
   }
 
   return (
-    <div className={clsx('rounded-lg border border-gray-200', className)}>
+    <div className={clsx('rounded-lg border border-accent-200 dark:border-accent-700', className)}>
       {/* Toolbar */}
-      <div className="flex items-center justify-between border-b border-gray-200 bg-gray-50 px-3 py-2">
+      <div className="flex items-center justify-between border-b border-accent-200 bg-accent-50 px-3 py-2 dark:border-accent-700 dark:bg-accent-800">
         <div className="flex gap-1">
           <button
             type="button"
@@ -63,8 +63,8 @@ export function MarkdownEditor({
             className={clsx(
               'rounded px-3 py-1 text-sm font-medium transition-colors',
               mode === 'preview'
-                ? 'bg-white text-gray-900 shadow-sm'
-                : 'text-gray-600 hover:text-gray-900'
+                ? 'bg-paper text-accent-800 shadow-sm dark:bg-[#f5f0e6] dark:text-accent-800'
+                : 'text-accent-600 hover:text-accent-800 dark:text-accent-400 dark:hover:text-accent-200'
             )}
           >
             Preview
@@ -76,8 +76,8 @@ export function MarkdownEditor({
               className={clsx(
                 'rounded px-3 py-1 text-sm font-medium transition-colors',
                 mode === 'edit'
-                  ? 'bg-white text-gray-900 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
+                  ? 'bg-paper text-accent-800 shadow-sm dark:bg-[#f5f0e6] dark:text-accent-800'
+                  : 'text-accent-600 hover:text-accent-800 dark:text-accent-400 dark:hover:text-accent-200'
               )}
             >
               Edit
@@ -85,22 +85,22 @@ export function MarkdownEditor({
           )}
         </div>
         {mode === 'edit' && (
-          <span className="text-xs text-gray-400">Markdown supported</span>
+          <span className="text-xs text-accent-400 dark:text-accent-500">Markdown supported</span>
         )}
       </div>
 
       {/* Content */}
-      <div className="min-h-[400px]">
+      <div className="min-h-[400px] bg-white dark:bg-[#f5f0e6]">
         {mode === 'edit' ? (
           <textarea
             value={value}
             onChange={(e) => onChange(e.target.value)}
-            className="h-full min-h-[400px] w-full resize-none p-4 font-mono text-sm focus:outline-none"
+            className="h-full min-h-[400px] w-full resize-none bg-transparent p-4 font-mono text-sm text-ink focus:outline-none dark:text-accent-800"
             placeholder="Write your markdown here..."
           />
         ) : (
           <div
-            className="prose prose-sm max-w-none p-4"
+            className="prose prose-sm max-w-none p-4 text-ink dark:text-accent-800 [&_blockquote]:border-accent-400 [&_blockquote]:text-accent-600 dark:[&_blockquote]:border-accent-500 dark:[&_blockquote]:text-accent-700 [&_code]:bg-accent-100 dark:[&_code]:bg-accent-200 [&_h1]:text-ink [&_h2]:text-ink [&_h3]:text-ink dark:[&_h1]:text-accent-800 dark:[&_h2]:text-accent-800 dark:[&_h3]:text-accent-800 [&_pre]:bg-accent-100 dark:[&_pre]:bg-accent-200 [&_strong]:text-ink dark:[&_strong]:text-accent-900"
             dangerouslySetInnerHTML={{ __html: renderMarkdown(value) }}
           />
         )}
