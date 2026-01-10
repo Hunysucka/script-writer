@@ -8,5 +8,5 @@ export const env = {
   openaiApiKey: process.env.OPENAI_API_KEY || '',
   anthropicApiKey: process.env.ANTHROPIC_API_KEY || '',
   tavilyApiKey: process.env.TAVILY_API_KEY || '',
-  aiProvider: (process.env.AI_PROVIDER || 'openai') as 'openai' | 'anthropic',
+  aiProvider: (process.env.AI_PROVIDER || 'anthropic') as 'openai' | 'anthropic',
 }
