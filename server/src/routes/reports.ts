@@ -1,8 +1,22 @@
 import { Router, type Request, type Response } from 'express'
 import { Report } from '../models/Report.js'
 import { createError } from '../middleware/errorHandler.js'
+import { convertStructuredToMarkdown, isJsonContent, parseJsonContent } from '../services/reportConverter.js'
 
 const router = Router()
+
+async function migrateReportIfNeeded(report: InstanceType<typeof Report>): Promise<void> {
+  if (report.structuredContent) return
+  
+  if (isJsonContent(report.content)) {
+    const parsed = parseJsonContent(report.content)
+    if (parsed) {
+      report.structuredContent = parsed
+      report.content = convertStructuredToMarkdown(parsed)
+      await report.save()
+    }
+  }
+}
 
 // List all reports
 router.get('/', async (req: Request, res: Response) => {
@@ -22,6 +36,10 @@ router.get('/', async (req: Request, res: Response) => {
 
   const reports = await Report.find(query).sort({ createdAt: -1 })
 
+  for (const report of reports) {
+    await migrateReportIfNeeded(report)
+  }
+
   res.json(reports)
 })
 
@@ -32,6 +50,8 @@ router.get('/:id', async (req: Request, res: Response) => {
   if (!report) {
     throw createError('Report not found', 404)
   }
+
+  await migrateReportIfNeeded(report)
 
   res.json(report)
 })

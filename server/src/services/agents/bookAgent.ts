@@ -7,6 +7,7 @@ import {
   failJob,
   type Job,
 } from '../../jobs/jobManager.js'
+import { convertStructuredToMarkdown, isJsonContent, parseJsonContent } from '../reportConverter.js'
 
 interface BookResearchInput {
   bookTitle: string
@@ -103,21 +104,45 @@ function parseBookResponse(response: string): {
   title: string
   summary: string
   content: string
+  structuredContent?: Record<string, unknown>
   sources: string[]
 } {
   try {
     const jsonMatch = response.match(/\{[\s\S]*\}/)
     if (jsonMatch) {
       const parsed = JSON.parse(jsonMatch[0])
+      const structuredContent = parsed
+      
+      let humanReadableContent: string
+      if (parsed.content && typeof parsed.content === 'string' && !isJsonContent(parsed.content)) {
+        humanReadableContent = parsed.content
+      } else {
+        humanReadableContent = convertStructuredToMarkdown(parsed)
+      }
+      
       return {
         title: parsed.title || 'Book Analysis',
         summary: parsed.summary || '',
-        content: parsed.content || response,
+        content: humanReadableContent,
+        structuredContent,
         sources: parsed.sources || [],
       }
     }
   } catch {
     // If JSON parsing fails, use the raw response
+  }
+
+  if (isJsonContent(response)) {
+    const parsed = parseJsonContent(response)
+    if (parsed) {
+      return {
+        title: (parsed.title as string) || 'Book Analysis',
+        summary: (parsed.summary as string) || '',
+        content: convertStructuredToMarkdown(parsed),
+        structuredContent: parsed,
+        sources: (parsed.sources as string[]) || [],
+      }
+    }
   }
 
   return {
@@ -165,6 +190,7 @@ async function runBookResearch(
     bookTitle: input.bookTitle,
     authorName: input.authorName,
     content: parsed.content,
+    structuredContent: parsed.structuredContent,
     summary: parsed.summary,
     sources: parsed.sources,
   })
