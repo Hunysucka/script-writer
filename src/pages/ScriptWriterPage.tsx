@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { toast } from 'sonner'
 import { useAppContext } from '@/hooks'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
+import { SkeletonReportCheckbox } from '@/components/ui/Skeleton'
 import { scriptService } from '@/services/scriptService'
 import type { ScriptPlatform, ResearchReport, Script } from '@/types'
 
@@ -19,6 +20,12 @@ export function ScriptWriterPage() {
   const [platform, setPlatform] = useState<ScriptPlatform>('youtube')
   const [generatedScript, setGeneratedScript] = useState<Script | null>(null)
   const [isGenerating, setIsGenerating] = useState(false)
+  const [isInitialLoad, setIsInitialLoad] = useState(true)
+
+  useEffect(() => {
+    const timer = setTimeout(() => setIsInitialLoad(false), 300)
+    return () => clearTimeout(timer)
+  }, [])
 
   const handleToggleReport = (reportId: string) => {
     setSelectedReportIds((prev) =>
@@ -78,7 +85,12 @@ export function ScriptWriterPage() {
       {/* Report Selection */}
       <Card>
         <h2 className="mb-4 font-serif text-xl font-medium text-ink dark:text-ink-light sm:mb-3 sm:text-lg">Select Reports</h2>
-        {state.reports.length === 0 ? (
+        {isInitialLoad ? (
+          <div className="space-y-3 sm:space-y-2">
+            <SkeletonReportCheckbox />
+            <SkeletonReportCheckbox />
+          </div>
+        ) : state.reports.length === 0 ? (
           <p className="text-base italic text-accent-500 dark:text-accent-400 sm:text-sm">
             No reports yet. Create one in the Research tab first.
           </p>

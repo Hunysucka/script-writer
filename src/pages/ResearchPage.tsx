@@ -1,10 +1,11 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { toast } from 'sonner'
 import { useAppContext } from '@/hooks'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Card } from '@/components/ui/Card'
 import { MarkdownEditor } from '@/components/ui/MarkdownEditor'
+import { SkeletonCard } from '@/components/ui/Skeleton'
 import { agentService } from '@/services/agentService'
 import type { ResearchType, ResearchReport } from '@/types'
 
@@ -16,6 +17,12 @@ export function ResearchPage() {
   const [topic, setTopic] = useState('')
   const [viewingReport, setViewingReport] = useState<ResearchReport | null>(null)
   const [editedContent, setEditedContent] = useState('')
+  const [isInitialLoad, setIsInitialLoad] = useState(true)
+
+  useEffect(() => {
+    const timer = setTimeout(() => setIsInitialLoad(false), 300)
+    return () => clearTimeout(timer)
+  }, [])
 
   const handleStartResearch = async () => {
     const input = {
@@ -267,31 +274,38 @@ export function ResearchPage() {
       )}
 
       {/* Recent Reports */}
-      {state.reports.length > 0 && (
+      {(isInitialLoad || state.reports.length > 0) && (
         <div className="space-y-5">
           <h2 className="font-serif text-2xl font-semibold text-ink dark:text-ink-light sm:text-xl">Recent Reports</h2>
-          {state.reports.slice(0, 5).map((report) => (
-            <Card
-              key={report.id}
-              onClick={() => handleViewReport(report)}
-              className="cursor-pointer transition-all duration-200 hover:border-accent-300 hover:shadow-md dark:hover:border-accent-600"
-            >
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                <div className="flex-1">
-                  <div className="flex flex-wrap items-center gap-3 sm:gap-2">
-                    <span className="rounded-full bg-accent-100 px-3 py-1 text-sm font-medium text-accent-700 dark:bg-accent-800 dark:text-accent-300 sm:px-2 sm:py-0.5 sm:text-xs">
-                      {report.researchType}
-                    </span>
-                    <h3 className="font-serif text-lg font-medium text-ink dark:text-ink-light sm:text-base">{report.title}</h3>
+          {isInitialLoad ? (
+            <>
+              <SkeletonCard />
+              <SkeletonCard />
+            </>
+          ) : (
+            state.reports.slice(0, 5).map((report) => (
+              <Card
+                key={report.id}
+                onClick={() => handleViewReport(report)}
+                className="cursor-pointer transition-all duration-200 hover:border-accent-300 hover:shadow-md dark:hover:border-accent-600"
+              >
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                  <div className="flex-1">
+                    <div className="flex flex-wrap items-center gap-3 sm:gap-2">
+                      <span className="rounded-full bg-accent-100 px-3 py-1 text-sm font-medium text-accent-700 dark:bg-accent-800 dark:text-accent-300 sm:px-2 sm:py-0.5 sm:text-xs">
+                        {report.researchType}
+                      </span>
+                      <h3 className="font-serif text-lg font-medium text-ink dark:text-ink-light sm:text-base">{report.title}</h3>
+                    </div>
+                    <p className="mt-2 line-clamp-2 text-base leading-relaxed text-accent-600 dark:text-accent-400 sm:mt-1 sm:text-sm">{report.summary}</p>
                   </div>
-                  <p className="mt-2 line-clamp-2 text-base leading-relaxed text-accent-600 dark:text-accent-400 sm:mt-1 sm:text-sm">{report.summary}</p>
+                  <span className="shrink-0 text-sm text-accent-400 dark:text-accent-500 sm:ml-4 sm:text-xs">
+                    {new Date(report.createdAt).toLocaleDateString()}
+                  </span>
                 </div>
-                <span className="shrink-0 text-sm text-accent-400 dark:text-accent-500 sm:ml-4 sm:text-xs">
-                  {new Date(report.createdAt).toLocaleDateString()}
-                </span>
-              </div>
-            </Card>
-          ))}
+              </Card>
+            ))
+          )}
         </div>
       )}
     </div>

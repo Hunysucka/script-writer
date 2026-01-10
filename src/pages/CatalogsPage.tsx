@@ -1,9 +1,10 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { toast } from 'sonner'
 import { useAppContext } from '@/hooks'
 import { Card } from '@/components/ui/Card'
 import { Input } from '@/components/ui/Input'
 import { MarkdownEditor } from '@/components/ui/MarkdownEditor'
+import { SkeletonCard } from '@/components/ui/Skeleton'
 import type { ResearchReport, Script } from '@/types'
 
 type Tab = 'reports' | 'scripts'
@@ -17,6 +18,12 @@ export function CatalogsPage() {
   const [activeTab, setActiveTab] = useState<Tab>('reports')
   const [search, setSearch] = useState('')
   const [selectedItem, setSelectedItem] = useState<ResearchReport | Script | null>(null)
+  const [isInitialLoad, setIsInitialLoad] = useState(true)
+
+  useEffect(() => {
+    const timer = setTimeout(() => setIsInitialLoad(false), 300)
+    return () => clearTimeout(timer)
+  }, [])
 
   const filteredReports = useMemo(() => {
     const query = search.toLowerCase()
@@ -103,7 +110,13 @@ export function CatalogsPage() {
 
       {/* List */}
       <div className="space-y-4">
-        {activeTab === 'reports' ? (
+        {isInitialLoad ? (
+          <>
+            <SkeletonCard />
+            <SkeletonCard />
+            <SkeletonCard />
+          </>
+        ) : activeTab === 'reports' ? (
           filteredReports.length === 0 ? (
             <EmptyState type="reports" />
           ) : (
