@@ -1,5 +1,5 @@
-// Use environment variable or default to localhost for development
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3001/api'
+// Use relative URL - Vite proxies /api to the backend
+const API_BASE = '/api'
 
 export async function apiRequest<T>(
   endpoint: string,
