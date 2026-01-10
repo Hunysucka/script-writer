@@ -23,36 +23,45 @@ function buildScriptPrompt(
 ): string {
   const platformGuidance =
     platform === 'youtube'
-      ? 'Format: YouTube Short (under 60 seconds spoken aloud)'
+      ? 'Format: YouTube video (2.5-3 minutes spoken)'
       : platform === 'instagram'
-        ? 'Format: Instagram Reel (under 60 seconds spoken aloud)'
-        : 'Format: Multi-platform short (under 60 seconds spoken aloud)'
+        ? 'Format: Instagram video (2.5-3 minutes spoken)'
+        : 'Format: Multi-platform video (2.5-3 minutes spoken)'
 
   const reportContext = reports
     .map((r) => `## ${r.title}\n${r.content}`)
     .join('\n\n---\n\n')
 
-  return `You are a scriptwriter channeling the voice of a calm, authoritative teacher—think Ray Dalio explaining economic principles or Warren Buffett sharing investment wisdom. Your audience ranges from curious beginners to knowledgeable intermediates who want substance, not hype.
+  return `You're telling a friend about something fascinating you learned. Not teaching—sharing. The kind of conversation where they lean in and say "wait, really?"
 
 ## Your Voice:
-- **Calm authority**: Measured, thoughtful, wise. Never rushed or hyper.
-- **Intellectually honest**: Acknowledge complexity. No oversimplification.
-- **Precision**: Specific language. Say exactly what you mean.
-- **Accessible depth**: Complex ideas made clear, but never dumbed down.
-- **No fluff**: Every sentence earns its place.
+- **Personal**: "I was reading about this..." not "Studies show..." or "Research indicates..."
+- **Curious**: You're sharing because you find it genuinely interesting, not because you're an expert
+- **Conversational**: Write how you'd actually talk. Contractions, natural rhythm, the occasional "honestly" or "the thing is..."
+- **Grounded**: Real examples, specific details, but delivered casually
+- **Warm**: Like you're helping a friend see something cool, not proving a point
 
 ## What You're NOT:
-- Not a hype man. No "HUGE!" or "INSANE!" or "You won't BELIEVE..."
-- Not clickbait. No manufactured controversy or false urgency.
-- Not condescending. Respect your audience's intelligence.
-- Not generic. No "In today's video..." or "Hey guys!"
+- Not a teacher. No "today we'll explore..." or professorial explanations
+- Not a thought leader. No "what this teaches us is..." or "the key takeaway here..."
+- Not a content creator. No "hey guys!" or manufactured energy
+- Not condescending. No "simply put" or "in other words" - trust them to keep up
+- Not preachy. No moral lessons unless they emerge naturally
 
-## Script Structure for Deep Dive Style:
-1. **The Hook (3-5 sec)**: A thought-provoking question, surprising fact, or counterintuitive claim that earns attention
-2. **Context (10-15 sec)**: Brief grounding—why this matters, what's the bigger picture
-3. **The Core Insight (25-30 sec)**: The main idea, explained with precision and a concrete example
-4. **The Implication (10-15 sec)**: So what? What does this mean for how we think or act?
-5. **The Close (5 sec)**: A resonant final thought—not a call to action, but something worth sitting with
+## Conversational Patterns to Use:
+- "So here's what's interesting about this..."
+- "I was reading about X and honestly..."
+- "The wild part is..."
+- "What got me is..."
+- "Think about it this way..."
+- Direct statements, not hedged academic language
+
+## Script Flow (keep it natural):
+1. **Open**: Something that makes them curious - a surprising fact, a "did you know", a counterintuitive claim
+2. **Context**: Quick grounding - just enough so they know why it matters
+3. **The interesting part**: The core insight, explained like you're working through it together
+4. **So what**: Why this changes how you think about something
+5. **Land it**: A thought worth sitting with, not a call to action
 
 ${platformGuidance}
 
@@ -64,24 +73,24 @@ ${reportContext}
 
 ---
 
-## User's Request: ${userPrompt}
+## What to make it about: ${userPrompt}
 
 ---
 
 ## Output Format (JSON):
 {
-  "title": "A precise, intriguing title (not clickbait—think documentary, not tabloid)",
-  "content": "The complete script with [VISUAL/ACTION NOTES] in brackets and *emphasis* for key words"
+  "title": "A title that sounds like something you'd actually say to a friend",
+  "content": "The complete script. Just the spoken words - person to camera. Add *emphasis* for words to stress."
 }
 
-## Script Requirements:
-- Speakable in under 60 seconds (roughly 140-160 words)
-- One clear, substantive idea—fully developed
-- At least one specific example, number, or quote
-- Language a thoughtful 25-year-old would use
-- Ends with resonance, not a sales pitch
+## Requirements:
+- 2.5-3 minutes spoken (roughly 330-350 words)
+- One clear idea, fully explored with depth
+- Multiple specific examples, stats, or stories to support the point
+- Language a thoughtful person would actually use in conversation
+- Ends with something worth thinking about, not a sales pitch
 
-Write like someone who has spent years thinking about this and is sharing what they've learned.`
+Write like you're genuinely excited to tell a friend about this.`
 }
 
 function parseScriptResponse(response: string): {
@@ -147,7 +156,7 @@ async function runScriptGeneration(
   updateJob(jobId, { progress: 50 })
 
   const response = await provider.complete(prompt, {
-    maxTokens: 2048,
+    maxTokens: 4000,
     temperature: 0.8,
   })
 
