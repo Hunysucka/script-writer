@@ -31,7 +31,7 @@
         const ctx = canvas.getContext('2d');
 
         // Configuration
-        const TOTAL_PARTICLES = 9000;
+        const TOTAL_PARTICLES = 12000;
         const EXPLOSION_DELAY = 2500;
         const RETURN_DELAY = 2500;
         const COLOR_RETURN_INTERVAL = 1000;
@@ -100,8 +100,8 @@
                 this.vx = 0;
                 this.vy = 0;
 
-                // Size
-                this.size = 1.5 + Math.random() * 1.5;
+                // Size (50% smaller)
+                this.size = 0.75 + Math.random() * 0.75;
 
                 // State
                 this.isExploded = false;
@@ -230,34 +230,77 @@
                 const relX = (x - centerX) / faceWidth;
                 const relY = (y - centerY) / faceHeight;
 
-                // Eyebrows
+                // Eyebrows - thick and defined
                 const leftBrowX = -0.32;
                 const rightBrowX = 0.32;
                 const browY = -0.22;
-                const browWidth = 0.2;
-                const browHeight = 0.04;
+                const browWidth = 0.18;
+                const browHeight = 0.035;
 
                 const inLeftBrow = Math.abs(relX - leftBrowX) < browWidth && Math.abs(relY - browY) < browHeight;
                 const inRightBrow = Math.abs(relX - rightBrowX) < browWidth && Math.abs(relY - browY) < browHeight;
 
-                if (inLeftBrow || inRightBrow) return 2.5;
+                if (inLeftBrow || inRightBrow) return 4;
 
-                // Nose ridge
-                if (Math.abs(relX) < 0.08 && relY > -0.1 && relY < 0.25) return 1.8;
+                // Nose bridge - narrow vertical line down center
+                if (Math.abs(relX) < 0.04 && relY > -0.08 && relY < 0.18) return 3.5;
 
-                // Nostrils
-                if (Math.abs(relX) < 0.12 && Math.abs(relX) > 0.03 && relY > 0.18 && relY < 0.26) return 2;
+                // Nose sides - create 3D shape
+                if (Math.abs(relX) > 0.03 && Math.abs(relX) < 0.09 && relY > 0.0 && relY < 0.2) return 3;
 
-                // Lips
-                if (Math.abs(relX) < 0.2 && relY > 0.35 && relY < 0.48) return 2.2;
+                // Nose tip - bulbous end
+                const noseTipDist = Math.sqrt(Math.pow(relX, 2) + Math.pow((relY - 0.2) * 2, 2));
+                if (noseTipDist < 0.08) return 4.5;
 
-                // Cheekbones
-                if (Math.abs(relX) > 0.35 && Math.abs(relX) < 0.5 && relY > -0.05 && relY < 0.15) return 1.5;
+                // Nostrils - dark holes on sides of nose tip
+                const leftNostrilX = -0.055;
+                const rightNostrilX = 0.055;
+                const nostrilY = 0.23;
+                const leftNostrilDist = Math.sqrt(Math.pow(relX - leftNostrilX, 2) + Math.pow((relY - nostrilY) * 1.5, 2));
+                const rightNostrilDist = Math.sqrt(Math.pow(relX - rightNostrilX, 2) + Math.pow((relY - nostrilY) * 1.5, 2));
+                if (leftNostrilDist < 0.035 || rightNostrilDist < 0.035) return 5;
 
-                // Jaw line
-                if (relY > 0.5 && Math.abs(relX) > 0.15) return 1.6;
+                // Nose bottom edge
+                if (Math.abs(relX) < 0.1 && relY > 0.22 && relY < 0.26) return 3.5;
 
-                return 1;
+                // Philtrum - groove between nose and upper lip
+                if (Math.abs(relX) < 0.025 && relY > 0.26 && relY < 0.34) return 3;
+
+                // Upper lip - cupid's bow shape
+                const upperLipY = 0.36;
+                const upperLipCurve = 0.015 * Math.cos(relX * 15);
+                if (Math.abs(relX) < 0.16 && relY > 0.33 + upperLipCurve && relY < 0.38) return 4.5;
+
+                // Lower lip - fuller, curved
+                const lowerLipY = 0.42;
+                const lowerLipCurve = -0.02 * (1 - Math.pow(relX / 0.14, 2));
+                if (Math.abs(relX) < 0.14 && relY > 0.39 && relY < 0.46 + lowerLipCurve) return 4;
+
+                // Lip line - dark line between lips
+                if (Math.abs(relX) < 0.13 && relY > 0.375 && relY < 0.395) return 5;
+
+                // Chin dimple/definition
+                const chinDist = Math.sqrt(Math.pow(relX, 2) + Math.pow((relY - 0.58) * 1.5, 2));
+                if (chinDist < 0.08) return 2.5;
+
+                // Cheekbones - higher density for definition
+                if (Math.abs(relX) > 0.32 && Math.abs(relX) < 0.48 && relY > -0.08 && relY < 0.12) return 2.5;
+
+                // Cheek hollows - slightly less dense
+                if (Math.abs(relX) > 0.2 && Math.abs(relX) < 0.35 && relY > 0.15 && relY < 0.35) return 1.8;
+
+                // Jaw line - strong definition
+                if (relY > 0.45 && Math.abs(relX) > 0.2 && Math.abs(relX) < 0.5) return 2.8;
+
+                // Under eye area
+                const leftUnderEye = Math.abs(relX - (-0.28)) < 0.12 && relY > -0.06 && relY < 0.02;
+                const rightUnderEye = Math.abs(relX - 0.28) < 0.12 && relY > -0.06 && relY < 0.02;
+                if (leftUnderEye || rightUnderEye) return 2;
+
+                // Temple areas
+                if (Math.abs(relX) > 0.4 && relY < -0.1 && relY > -0.3) return 1.8;
+
+                return 1.2;
             }
 
             const topHeadParticles = [];
@@ -276,7 +319,7 @@
                 if (isInEyeArea(x, y)) continue;
 
                 const density = getDensityMultiplier(x, y);
-                if (Math.random() > density / 2.5) continue;
+                if (Math.random() > density / 5) continue;
 
                 const isTop = isTopOfHead(x, y);
 
