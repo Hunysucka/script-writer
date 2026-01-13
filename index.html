@@ -117,12 +117,12 @@
 
                 this.isExploded = true;
 
-                // Calculate explosion direction (away from center)
-                const angle = Math.atan2(this.y - centerY, this.x - centerX) + (Math.random() - 0.5) * 0.8;
-                const speed = 8 + Math.random() * 12;
+                // Calculate explosion direction - straight outward in all directions
+                const angle = Math.atan2(this.y - centerY, this.x - centerX) + (Math.random() - 0.5) * 0.3;
+                const speed = 25 + Math.random() * 15;
 
                 this.vx = Math.cos(angle) * speed;
-                this.vy = Math.sin(angle) * speed - Math.random() * 5;
+                this.vy = Math.sin(angle) * speed;
 
                 // Change to explosion color
                 this.hue = this.explosionHue;
@@ -137,26 +137,24 @@
 
             update(time) {
                 if (this.isExploded && !this.isReturning) {
-                    // Flying outward
+                    // Flying straight outward - no gravity, no friction
                     this.x += this.vx;
                     this.y += this.vy;
-                    this.vy += 0.1;
-                    this.vx *= 0.99;
-                    this.vy *= 0.99;
                 } else if (this.isReturning && !this.hasReturned) {
-                    // Return to original position
+                    // Return straight back to original position
                     const dx = this.originalX - this.x;
                     const dy = this.originalY - this.y;
                     const dist = Math.sqrt(dx * dx + dy * dy);
 
-                    if (dist < 2) {
+                    if (dist < 3) {
                         this.x = this.originalX;
                         this.y = this.originalY;
                         this.hasReturned = true;
                         this.vx = 0;
                         this.vy = 0;
                     } else {
-                        const speed = Math.min(dist * 0.08, 15);
+                        // Fast straight return
+                        const speed = Math.min(dist * 0.12, 30);
                         this.vx = (dx / dist) * speed;
                         this.vy = (dy / dist) * speed;
                         this.x += this.vx;
